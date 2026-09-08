@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maaz International - Lead Management System</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        /* Loader Overlay */
+        #loader-overlay { display: none; }
+        #loader-overlay.active { display: flex; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased h-screen overflow-hidden flex flex-col">
+
+    <div id="login-section" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md mx-4">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-800">Maaz International</h1>
+                <p class="text-sm text-slate-500 mt-1">Lead Management System</p>
+            </div>
+            <form id="login-form" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                    <input type="email" id="login-email" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors" placeholder="Enter your email">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <input type="password" id="login-password" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition-colors shadow-sm">
+                    Secure Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="dashboard-section" class="hidden flex h-full w-full">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col shadow-xl z-10 flex-shrink-0">
+            <div class="p-6 border-b border-slate-800">
+                <h2 class="text-xl font-bold text-white tracking-tight">Maaz Int.</h2>
+                <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider">BPO Dashboard</p>
+            </div>
+            <nav class="flex-1 py-4 space-y-1 px-3">
+                <button onclick="switchTab('overview')" id="nav-overview" class="nav-btn w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg bg-blue-600 text-white transition-colors">
+                    <svg class="mr-3 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    Overview
+                </button>
+                <button onclick="switchTab('upload')" id="nav-upload" class="nav-btn w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-800 hover:text-white text-slate-300 transition-colors">
+                    <svg class="mr-3 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    Upload Leads
+                </button>
+                <button onclick="switchTab('export')" id="nav-export" class="nav-btn w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="mr-3 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Export Data
+                </button>
+                <button onclick="switchTab('logs')" id="nav-logs" class="nav-btn w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="mr-3 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Export Logs
+                </button>
+            </nav>
+            <div class="p-4 border-t border-slate-800">
+                <div class="flex items-center mb-4 px-2">
+                    <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm mr-3">M</div>
+                    <div>
+                        <p class="text-sm font-medium text-white">Welcome,</p>
+                        <p class="text-xs text-slate-400">Moh. Mohsin</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-800 hover:text-white transition-colors">
+                    <svg class="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col h-full bg-slate-50 overflow-hidden">
+            <!-- Header -->
+            <header class="bg-white shadow-sm z-0">
+                <div class="px-8 py-5 flex items-center justify-between">
+                    <h2 class="text-2xl font-semibold text-slate-800">Maaz International - BPO Cold Calling Dashboard</h2>
+                </div>
+            </header>
+
+            <!-- Scrollable View Container -->
+            <div class="flex-1 overflow-y-auto p-8">
+                
+                <!-- Tab: Overview / Dashboard -->
+                <div id="view-overview" class="tab-content active max-w-5xl mx-auto">
+                    
+                    <div class="mb-8">
+                        <h3 class="text-xl font-bold text-slate-800 mb-4">System Overview</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Total Leads -->
+                            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col items-center justify-center col-span-1 md:col-span-3 lg:col-span-1 bg-gradient-to-br from-blue-50 to-white">
+                                <div class="text-slate-500 text-sm font-medium uppercase tracking-wider mb-2">Total Leads In Database</div>
+                                <div id="stat-total" class="text-4xl font-extrabold text-blue-700">0</div>
+                            </div>
+                            
+                            <!-- Timezones Breakdown -->
+                            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 col-span-1 md:col-span-3 lg:col-span-2">
+                                <div class="text-slate-800 text-sm font-semibold mb-4 border-b pb-2">Leads Available by Timezone</div>
+                                <div class="grid grid-cols-4 gap-4 text-center">
+                                    <div>
+                                        <div class="text-xs text-slate-500 uppercase">EST</div>
+                                        <div id="stat-est" class="text-xl font-bold text-slate-700">0</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs text-slate-500 uppercase">CST</div>
+                                        <div id="stat-cst" class="text-xl font-bold text-slate-700">0</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs text-slate-500 uppercase">MST</div>
+                                        <div id="stat-mst" class="text-xl font-bold text-slate-700">0</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs text-slate-500 uppercase">PST</div>
+                                        <div id="stat-pst" class="text-xl font-bold text-slate-700">0</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Exports Report -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                            <h3 class="text-md font-semibold text-slate-800">Recent Export Reports</h3>
+                            <button onclick="loadDashboardData()" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                Refresh
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-200">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Category & Timezone</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Numbers Exported</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-logs-body" class="bg-white divide-y divide-slate-200">
+                                    <tr><td colspan="3" class="px-6 py-4 text-center text-sm text-slate-500">Loading data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Upload Leads -->
+                <div id="view-upload" class="tab-content max-w-4xl mx-auto">
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="px-6 py-5 border-b border-slate-100">
+                            <h3 class="text-lg font-semibold text-slate-800">Upload & Process Leads</h3>
+                            <p class="text-sm text-slate-500 mt-1">Upload an Excel (.xlsx) file to automatically parse, deduplicate, and map phone numbers to their respective US Timezones.</p>
+                        </div>
+                        <div class="p-6">
+                            <form id="upload-form" class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Category (Select existing or create new)</label>
+                                    <select id="upload-category-select" onchange="toggleNewCategoryInput()" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white mb-2">
+                                        <option value="">Loading categories...</option>
+                                    </select>
+                                    <input type="text" id="upload-category-new" class="hidden w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="Enter new dataset category name">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Excel File (.xlsx)</label>
+                                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-lg hover:border-blue-500 transition-colors bg-slate-50 cursor-pointer" onclick="document.getElementById('upload-file').click()">
+                                        <div class="space-y-1 text-center">
+                                            <svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                            <div class="flex text-sm text-slate-600 justify-center">
+                                                <label for="upload-file" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                                    <span>Upload a file</span>
+                                                    <input id="upload-file" name="upload-file" type="file" accept=".xlsx, .xls" class="sr-only" required>
+                                                </label>
+                                                <p class="pl-1">or drag and drop</p>
+                                            </div>
+                                            <p class="text-xs text-slate-500" id="file-name-display">XLSX up to 10MB</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pt-2">
+                                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-3 rounded-lg shadow-sm transition-colors flex justify-center items-center">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                        Upload & Process Data
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Export Data -->
+                <div id="view-export" class="tab-content max-w-4xl mx-auto">
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-800">Export Leads Data</h3>
+                                <p class="text-sm text-slate-500 mt-1">Filter your processed lists by category and timezone to generate targeted calling lists.</p>
+                            </div>
+                            <button onclick="loadCategoriesForExport()" class="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-50" title="Refresh Categories">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            </button>
+                        </div>
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Select Category</label>
+                                    <select id="export-category" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
+                                        <option value="">Loading categories...</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Target Time Zone</label>
+                                    <select id="export-timezone" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
+                                        <option value="All">All Timezones</option>
+                                        <option value="EST">EST (Eastern Standard Time)</option>
+                                        <option value="CST">CST (Central Standard Time)</option>
+                                        <option value="MST">MST (Mountain Standard Time)</option>
+                                        <option value="PST">PST (Pacific Standard Time)</option>
+                                        <option value="Unknown">Unknown / Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-8">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Export Quantity (Leave empty for all matching leads)</label>
+                                <input type="number" id="export-quantity" min="1" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white" placeholder="e.g., 5000">
+                                <p class="text-xs text-slate-500 mt-1">Specify how many numbers you want to extract in this batch.</p>
+                            </div>
+                            <button onclick="handleExport()" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg shadow-sm transition-colors flex justify-center items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                Generate & Download Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Export Logs -->
+                <div id="view-logs" class="tab-content max-w-5xl mx-auto">
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full">
+                        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-800">Export Audit Log</h3>
+                                <p class="text-sm text-slate-500 mt-1">History of all lists extracted from the database.</p>
+                            </div>
+                            <button onclick="loadExportLogs()" class="flex items-center px-4 py-2 bg-white border border-slate-300 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                Refresh Logs
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-200">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Timestamp</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Category Extracted</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Timezone Filter</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Total Records</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logs-table-body" class="bg-white divide-y divide-slate-200">
+                                    <!-- Logs injected via JS -->
+                                    <tr><td colspan="4" class="px-6 py-10 text-center text-sm text-slate-500">Loading logs...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Spinner Overlay -->
+    <div id="loader-overlay" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm items-center justify-center flex-col">
+        <svg class="animate-spin h-12 w-12 text-white mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p id="loader-text" class="text-white text-lg font-medium">Processing Data...</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, query, where, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Handle Sandbox Environment App ID & Configurations
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'maaz-bpo-app';
+        
+        // User provided config falling back to environment config if applicable
+        const customFirebaseConfig = {
+            apiKey: "AIzaSyAgwMd4nibgj5DfPmTVak_26GFPqXuDHEo",
+            authDomain: "data-management-44b28.firebaseapp.com",
+            projectId: "data-management-44b28",
+            storageBucket: "data-management-44b28.firebasestorage.app",
+            messagingSenderId: "268845184884",
+            appId: "1:268845184884:web:93c5e45f5ecdeeb3231e21",
+            measurementId: "G-RT4DM2C5C6"
+        };
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : customFirebaseConfig;
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Strict Paths mapping based on mandatory rule 1
+        const leadsCollectionPath = `artifacts/${appId}/public/data/leads`;
+        const exportLogsCollectionPath = `artifacts/${appId}/public/data/export_logs`;
+        const metaCollectionPath = `artifacts/${appId}/public/data/metadata`; // For storing unique categories list
+
+        let isFirebaseReady = false;
+
+        // Hardcoded Credentials
+        const ADMIN_EMAIL = 'm.m.raza2932@gmail.com';
+        const ADMIN_PASS = 'Maaz@2026';
+
+        window.onload = async () => {
+            checkSession();
+            
+            // File input name update
+            document.getElementById('upload-file').addEventListener('change', function(e) {
+                const fileName = e.target.files[0]?.name || 'XLSX up to 10MB';
+                document.getElementById('file-name-display').innerText = fileName;
+            });
+        };
+
+        function checkSession() {
+            if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('dashboard-section').classList.remove('hidden');
+                initFirebaseBackground();
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+
+            if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
+                sessionStorage.setItem('isAdminLoggedIn', 'true');
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('dashboard-section').classList.remove('hidden');
+                initFirebaseBackground();
+                Swal.fire({
+                    title: 'Welcome Back!', text: 'Successfully logged in.', icon: 'success',
+                    timer: 1500, showConfirmButton: false
+                });
+            } else {
+                Swal.fire({
+                    title: 'Access Denied', text: 'Invalid email or password.', icon: 'error', confirmButtonColor: '#3085d6'
+                });
+            }
+        });
+
+        window.logout = function() {
+            sessionStorage.removeItem('isAdminLoggedIn');
+            window.location.reload();
+        }
+
+        window.switchTab = function(tabName) {
+            // Update Navigation UI
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('hover:bg-slate-800', 'hover:text-white', 'text-slate-300');
+            });
+            const activeBtn = document.getElementById(`nav-${tabName}`);
+            activeBtn.classList.add('bg-blue-600', 'text-white');
+            activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
+
+            // Update View Content
+            document.querySelectorAll('.tab-content').forEach(view => view.classList.remove('active'));
+            document.getElementById(`view-${tabName}`).classList.add('active');
+
+            // View-specific actions
+            if (tabName === 'overview') loadDashboardData();
+            if (tabName === 'export') loadCategoriesForExport();
+            if (tabName === 'logs') loadExportLogs();
+        }
+
+        window.toggleNewCategoryInput = function() {
+            const select = document.getElementById('upload-category-select');
+            const input = document.getElementById('upload-category-new');
+            if (select.value === '_NEW_') {
+                input.classList.remove('hidden');
+                input.required = true;
+                input.focus();
+            } else {
+                input.classList.add('hidden');
+                input.required = false;
+            }
+        }
+
+        // Initialize Firebase Anonymously in Background (Mandatory Rule 3)
+        async function initFirebaseBackground() {
+            try {
+                // To satisfy sandbox rules while keeping the user's custom auth UI
+                await signInAnonymously(auth);
+                isFirebaseReady = true;
+                // Pre-load data
+                loadCategoriesForExport();
+                loadDashboardData();
+            } catch (error) {
+                console.error("Firebase Auth Error: ", error);
+                Swal.fire('Connection Error', 'Could not connect to database. Please refresh.', 'error');
+            }
+        }
+
+        function showLoader(text = 'Processing...') {
+            document.getElementById('loader-text').innerText = text;
+            document.getElementById('loader-overlay').classList.add('active');
+        }
+
+        function hideLoader() {
+            document.getElementById('loader-overlay').classList.remove('active');
+        }
+
+        // Comprehensive US/Canada Area Code mapping to States
+        const areaCodeToState = {
+            "201": "NJ", "202": "DC", "203": "CT", "205": "AL", "206": "WA", "207": "ME", "208": "ID", "209": "CA",
+            "210": "TX", "212": "NY", "213": "CA", "214": "TX", "215": "PA", "216": "OH", "217": "IL", "218": "MN",
+            "219": "IN", "224": "IL", "225": "LA", "228": "MS", "229": "GA", "231": "MI", "234": "OH", "239": "FL",
+            "240": "MD", "248": "MI", "251": "AL", "252": "NC", "253": "WA", "254": "TX", "256": "AL", "260": "IN",
+            "262": "WI", "267": "PA", "269": "MI", "270": "KY", "276": "VA", "281": "TX", "301": "MD", "302": "DE",
+            "303": "CO", "304": "WV", "305": "FL", "307": "WY", "308": "NE", "309": "IL", "310": "CA", "312": "IL",
+            "313": "MI", "314": "MO", "315": "NY", "316": "KS", "317": "IN", "318": "LA", "319": "IA", "320": "MN",
+            "321": "FL", "323": "CA", "325": "TX", "330": "OH", "334": "AL", "336": "NC", "337": "LA", "339": "MA",
+            "347": "NY", "351": "MA", "352": "FL", "360": "WA", "361": "TX", "386": "FL", "401": "RI", "402": "NE",
+            "404": "GA", "405": "OK", "406": "MT", "407": "FL", "408": "CA", "409": "TX", "410": "MD", "412": "PA",
+            "413": "MA", "414": "WI", "415": "CA", "417": "MO", "419": "OH", "423": "TN", "425": "WA", "430": "TX",
+            "432": "TX", "434": "VA", "435": "UT", "440": "OH", "443": "MD", "469": "TX", "470": "GA", "475": "CT",
+            "478": "GA", "479": "AR", "480": "AZ", "484": "PA", "501": "AR", "502": "KY", "503": "OR", "504": "LA",
+            "505": "NM", "507": "MN", "508": "MA", "509": "WA", "510": "CA", "512": "TX", "513": "OH", "515": "IA",
+            "516": "NY", "517": "MI", "518": "NY", "520": "AZ", "530": "CA", "540": "VA", "559": "CA", "561": "FL",
+            "562": "CA", "563": "IA", "570": "PA", "571": "VA", "573": "MO", "574": "IN", "580": "OK", "585": "NY",
+            "586": "MI", "601": "MS", "602": "AZ", "603": "NH", "605": "SD", "607": "NY", "608": "WI", "609": "NJ",
+            "610": "PA", "612": "MN", "614": "OH", "615": "TN", "616": "MI", "617": "MA", "618": "IL", "619": "CA",
+            "620": "KS", "623": "AZ", "626": "CA", "630": "IL", "631": "NY", "636": "MO", "641": "IA", "646": "NY",
+            "650": "CA", "651": "MN", "660": "MO", "661": "CA", "662": "MS", "678": "GA", "682": "TX", "701": "ND",
+            "702": "NV", "703": "VA", "704": "NC", "706": "GA", "707": "CA", "708": "IL", "712": "IA", "713": "TX",
+            "714": "CA", "715": "WI", "716": "NY", "717": "PA", "718": "NY", "719": "CO", "720": "CO", "724": "PA",
+            "727": "FL", "731": "TN", "732": "NJ", "734": "MI", "740": "OH", "757": "VA", "760": "CA", "763": "MN",
+            "765": "IN", "770": "GA", "772": "FL", "773": "IL", "774": "MA", "775": "NV", "781": "MA", "785": "KS",
+            "786": "FL", "801": "UT", "802": "VT", "803": "SC", "804": "VA", "805": "CA", "806": "TX", "808": "HI",
+            "810": "MI", "812": "IN", "813": "FL", "814": "PA", "815": "IL", "816": "MO", "817": "TX", "818": "CA",
+            "828": "NC", "830": "TX", "831": "CA", "832": "TX", "843": "SC", "845": "NY", "847": "IL", "850": "FL",
+            "856": "NJ", "858": "CA", "859": "KY", "860": "CT", "862": "NJ", "863": "FL", "864": "SC", "865": "TN",
+            "870": "AR", "901": "TN", "903": "TX", "904": "FL", "906": "MI", "907": "AK", "908": "NJ", "909": "CA",
+            "910": "NC", "912": "GA", "913": "KS", "914": "NY", "915": "TX", "916": "CA", "917": "NY", "918": "OK",
+            "919": "NC", "920": "WI", "925": "CA", "928": "AZ", "931": "TN", "936": "TX", "937": "OH", "940": "TX",
+            "941": "FL", "947": "MI", "949": "CA", "952": "MN", "954": "FL", "956": "TX", "970": "CO", "971": "OR",
+            "972": "TX", "973": "NJ", "978": "MA", "979": "TX", "980": "NC", "985": "LA", "989": "MI"
+        };
+
+        const stateToTimeZone = {
+            "CT": "EST", "DC": "EST", "DE": "EST", "FL": "EST", "GA": "EST", "IN": "EST", "ME": "EST", 
+            "MD": "EST", "MA": "EST", "MI": "EST", "NH": "EST", "NJ": "EST", "NY": "EST", "NC": "EST", 
+            "OH": "EST", "PA": "EST", "RI": "EST", "SC": "EST", "VT": "EST", "VA": "EST", "WV": "EST",
+            "AL": "CST", "AR": "CST", "IL": "CST", "IA": "CST", "KS": "CST", "KY": "CST", "LA": "CST", 
+            "MN": "CST", "MS": "CST", "MO": "CST", "NE": "CST", "ND": "CST", "OK": "CST", "SD": "CST", 
+            "TN": "CST", "TX": "CST", "WI": "CST",
+            "AZ": "MST", "CO": "MST", "ID": "MST", "MT": "MST", "NM": "MST", "UT": "MST", "WY": "MST",
+            "CA": "PST", "NV": "PST", "OR": "PST", "WA": "PST"
+        };
+
+        function mapPhoneData(phoneString) {
+            const cleanPhone = phoneString.replace(/\D/g, ''); // strip non-numeric
+            if (cleanPhone.length < 10) return { number: cleanPhone, areaCode: "Unknown", state: "Unknown", tz: "Unknown" };
+            
+            // Handle optional country code 1
+            const tenDigit = cleanPhone.length === 11 && cleanPhone.startsWith('1') ? cleanPhone.substring(1) : cleanPhone;
+            const areaCode = tenDigit.substring(0, 3);
+            const state = areaCodeToState[areaCode] || "Unknown";
+            const tz = stateToTimeZone[state] || "Unknown";
+
+            return { number: cleanPhone, areaCode, state, tz };
+        }
+
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!isFirebaseReady) return Swal.fire('Error', 'Database not connected yet.', 'error');
+            
+            let category = document.getElementById('upload-category-select').value;
+            if (category === '_NEW_') {
+                category = document.getElementById('upload-category-new').value.trim();
+            }
+            
+            if (!category) {
+                return Swal.fire('Missing Details', 'Please select or create a category name.', 'warning');
+            }
+
+            const fileInput = document.getElementById('upload-file');
+            if (!fileInput.files.length) return;
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            showLoader('Parsing Excel File...');
+
+            reader.onload = async (e) => {
+                try {
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, { type: 'binary' });
+                    const sheetName = workbook.SheetNames[0];
+                    const rawJson = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
+
+                    if (rawJson.length === 0) throw new Error("Excel file is empty.");
+
+                    showLoader('Analyzing Data & Deduplicating...');
+
+                    // 1. Identify Phone Column intelligently
+                    let phoneKey = null;
+                    const keys = Object.keys(rawJson[0]);
+                    for (let key of keys) {
+                        if (key.toLowerCase().match(/phone|contact|mobile|cell|tel/)) {
+                            phoneKey = key; break;
+                        }
+                    }
+                    if (!phoneKey) phoneKey = keys[0]; // fallback to first column
+
+                    // 2. Process and Internal Deduplication
+                    const processedRecords = [];
+                    const internalSet = new Set();
+
+                    rawJson.forEach(row => {
+                        const rawPhone = String(row[phoneKey]);
+                        if (!rawPhone || rawPhone.trim() === '') return;
+
+                        const { number, areaCode, state, tz } = mapPhoneData(rawPhone);
+                        if (number.length >= 10 && !internalSet.has(number)) {
+                            internalSet.add(number);
+                            processedRecords.push({
+                                PhoneNumber: number,
+                                Category: category,
+                                AreaCode: areaCode,
+                                State: state,
+                                TimeZone: tz,
+                                UploadTimestamp: new Date().toISOString(),
+                                OriginalData: JSON.stringify(row)
+                            });
+                        }
+                    });
+
+                    // 3. Database Deduplication (Rule 2: Simple query to avoid index requirements)
+                    showLoader('Checking existing database records...');
+                    const leadsRef = collection(db, leadsCollectionPath);
+                    const categoryQuery = query(leadsRef, where("Category", "==", category));
+                    const existingDocs = await getDocs(categoryQuery);
+                    
+                    const dbSet = new Set();
+                    existingDocs.forEach(doc => {
+                        dbSet.add(doc.data().PhoneNumber);
+                    });
+
+                    const finalUniqueRecords = processedRecords.filter(r => !dbSet.has(r.PhoneNumber));
+
+                    if (finalUniqueRecords.length === 0) {
+                        hideLoader();
+                        return Swal.fire('Completed', 'No new unique records found. All numbers were duplicates.', 'info');
+                    }
+
+                    // 4. Batch Saving to Firestore (Sequentially to avoid massive payload rejections, with progress)
+                    showLoader(`Saving ${finalUniqueRecords.length} new records...`);
+                    
+                    for(let i=0; i<finalUniqueRecords.length; i++){
+                        await addDoc(leadsRef, finalUniqueRecords[i]);
+                        if(i % 50 === 0) {
+                            document.getElementById('loader-text').innerText = `Saving ${i}/${finalUniqueRecords.length} new records...`;
+                        }
+                    }
+
+                    // 5. Update Categories Metadata
+                    await updateCategoriesMeta(category);
+
+                    hideLoader();
+                    document.getElementById('upload-form').reset();
+                    document.getElementById('file-name-display').innerText = 'XLSX up to 10MB';
+                    Swal.fire('Success!', `Successfully imported ${finalUniqueRecords.length} unique leads.`, 'success');
+
+                } catch (error) {
+                    console.error("Upload Error:", error);
+                    hideLoader();
+                    Swal.fire('Error Processing File', error.message, 'error');
+                }
+            };
+            reader.readAsBinaryString(file);
+        });
+
+        // Maintain a single document for categories to avoid heavy DISTINCT queries
+        async function updateCategoriesMeta(newCategory) {
+            try {
+                const metaDocRef = doc(db, metaCollectionPath, 'categoriesList');
+                const metaDoc = await getDoc(metaDocRef);
+                
+                let categories = [];
+                if (metaDoc.exists()) {
+                    categories = metaDoc.data().list || [];
+                }
+
+                if (!categories.includes(newCategory)) {
+                    categories.push(newCategory);
+                    await setDoc(metaDocRef, { list: categories });
+                }
+            } catch (err) {
+                console.error("Error updating categories meta", err);
+            }
+        }
+
+        window.loadCategoriesForExport = async function() {
+            if (!isFirebaseReady) return;
+            const exportSelect = document.getElementById('export-category');
+            const uploadSelect = document.getElementById('upload-category-select');
+            
+            exportSelect.innerHTML = '<option value="">Loading...</option>';
+            if (uploadSelect) uploadSelect.innerHTML = '<option value="">Loading...</option>';
+            
+            try {
+                const metaDocRef = doc(db, metaCollectionPath, 'categoriesList');
+                const metaDoc = await getDoc(metaDocRef);
+                
+                exportSelect.innerHTML = '<option value="">-- Select a Category --</option>';
+                if (uploadSelect) uploadSelect.innerHTML = '<option value="">-- Select Category --</option><option value="_NEW_" class="font-semibold text-blue-700">+ Create New Category</option>';
+
+                if (metaDoc.exists() && metaDoc.data().list) {
+                    const categories = metaDoc.data().list;
+                    categories.forEach(cat => {
+                        const optExport = document.createElement('option');
+                        optExport.value = cat; optExport.innerText = cat;
+                        exportSelect.appendChild(optExport);
+                        
+                        if (uploadSelect) {
+                            const optUpload = document.createElement('option');
+                            optUpload.value = cat; optUpload.innerText = cat;
+                            uploadSelect.appendChild(optUpload);
+                        }
+                    });
+                } else {
+                    exportSelect.innerHTML = '<option value="">No categories found</option>';
+                }
+            } catch (err) {
+                console.error("Error loading categories", err);
+                exportSelect.innerHTML = '<option value="">Error loading categories</option>';
+            }
+        }
+
+        window.handleExport = async function() {
+            if (!isFirebaseReady) return;
+            const category = document.getElementById('export-category').value;
+            const timezone = document.getElementById('export-timezone').value;
+
+            if (!category) {
+                return Swal.fire('Hold on', 'Please select a Category first.', 'warning');
+            }
+
+            try {
+                showLoader('Extracting Data from Database...');
+                
+                // Rule 2: Single simple query. Filter timezone in-memory.
+                const leadsRef = collection(db, leadsCollectionPath);
+                const exportQuery = query(leadsRef, where("Category", "==", category));
+                const snapshot = await getDocs(exportQuery);
+
+                const exportData = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (timezone === 'All' || data.TimeZone === timezone) {
+                        // Reconstruct flattened object for excel
+                        let original = {};
+                        try { original = JSON.parse(data.OriginalData); } catch(e){}
+                        
+                        exportData.push({
+                            ...original,
+                            '_System_Phone': data.PhoneNumber,
+                            '_System_AreaCode': data.AreaCode,
+                            '_System_State': data.State,
+                            '_System_TimeZone': data.TimeZone
+                        });
+                    }
+                });
+
+                if (exportData.length === 0) {
+                    hideLoader();
+                    return Swal.fire('No Results', 'No records found matching your filters.', 'info');
+                }
+
+                // Apply Quantity Limit if specified
+                const quantityInput = document.getElementById('export-quantity').value;
+                const limit = parseInt(quantityInput);
+                let finalExportData = exportData;
+                
+                if (!isNaN(limit) && limit > 0 && limit < exportData.length) {
+                    finalExportData = exportData.slice(0, limit);
+                }
+
+                showLoader('Generating Excel File...');
+
+                // Create and Download Excel via SheetJS
+                const worksheet = XLSX.utils.json_to_sheet(finalExportData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
+                
+                const fileName = `Export_${category}_${timezone}_${new Date().getTime()}.xlsx`;
+                XLSX.writeFile(workbook, fileName);
+
+                // Log the export
+                await logExportActivity(category, timezone, finalExportData.length);
+
+                hideLoader();
+                Swal.fire('Export Complete', `${finalExportData.length} leads successfully exported.`, 'success');
+
+                // Refresh dashboard automatically in background
+                loadDashboardData();
+
+            } catch (error) {
+                console.error("Export error:", error);
+                hideLoader();
+                Swal.fire('Export Failed', error.message, 'error');
+            }
+        }
+
+        async function logExportActivity(category, timezone, count) {
+            try {
+                const logsRef = collection(db, exportLogsCollectionPath);
+                await addDoc(logsRef, {
+                    Timestamp: new Date().toISOString(),
+                    Category: category,
+                    TimeZoneFilter: timezone,
+                    TotalRecordsExported: count,
+                    ExportedBy: "Admin"
+                });
+            } catch (err) {
+                console.error("Failed to write export log", err);
+            }
+        }
+
+        window.loadExportLogs = async function() {
+            if (!isFirebaseReady) return;
+            const tbody = document.getElementById('logs-table-body');
+            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-sm text-slate-500">Loading logs...</td></tr>';
+            
+            try {
+                const logsRef = collection(db, exportLogsCollectionPath);
+                // Due to Sandbox Rule 2 (No complex orderBy that require indexes), fetch all logs and sort in JS
+                const snapshot = await getDocs(logsRef);
+                
+                let logs = [];
+                snapshot.forEach(doc => logs.push(doc.data()));
+                
+                // Sort descending by Timestamp
+                logs.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
+
+                if (logs.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-sm text-slate-500">No export history found.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                logs.forEach(log => {
+                    const dateStr = new Date(log.Timestamp).toLocaleString();
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 transition-colors';
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${dateStr}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800">${log.Category}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">${log.TimeZoneFilter}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800 font-medium">${log.TotalRecordsExported.toLocaleString()}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+            } catch (error) {
+                console.error("Failed to load logs:", error);
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-sm text-red-500">Error loading logs. Please try again.</td></tr>';
+            }
+        }
+
+        window.loadDashboardData = async function() {
+            if (!isFirebaseReady) return;
+            
+            // Set Loading States
+            document.getElementById('stat-total').innerText = '...';
+            document.getElementById('stat-est').innerText = '...';
+            document.getElementById('stat-cst').innerText = '...';
+            document.getElementById('stat-mst').innerText = '...';
+            document.getElementById('stat-pst').innerText = '...';
+            
+            const recentLogsTbody = document.getElementById('recent-logs-body');
+            recentLogsTbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm text-slate-500">Loading data...</td></tr>';
+
+            try {
+                // Fetch Leads for Stats
+                const leadsRef = collection(db, leadsCollectionPath);
+                const leadsSnap = await getDocs(leadsRef);
+                
+                let total = 0;
+                let tzCounts = { 'EST': 0, 'CST': 0, 'MST': 0, 'PST': 0, 'Unknown': 0 };
+                
+                leadsSnap.forEach(doc => {
+                    total++;
+                    const tz = doc.data().TimeZone;
+                    if (tzCounts[tz] !== undefined) tzCounts[tz]++;
+                    else tzCounts['Unknown']++;
+                });
+
+                // Update UI Stats securely
+                document.getElementById('stat-total').innerText = total.toLocaleString();
+                document.getElementById('stat-est').innerText = tzCounts['EST'].toLocaleString();
+                document.getElementById('stat-cst').innerText = tzCounts['CST'].toLocaleString();
+                document.getElementById('stat-mst').innerText = tzCounts['MST'].toLocaleString();
+                document.getElementById('stat-pst').innerText = tzCounts['PST'].toLocaleString();
+
+                // Fetch Recent Export Logs
+                const logsRef = collection(db, exportLogsCollectionPath);
+                const logsSnap = await getDocs(logsRef);
+                let logs = [];
+                logsSnap.forEach(doc => logs.push(doc.data()));
+                logs.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
+                
+                const recentLogs = logs.slice(0, 5); // Get top 5 recent
+                
+                if (recentLogs.length === 0) {
+                    recentLogsTbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm text-slate-500">No exports yet.</td></tr>';
+                    return;
+                }
+
+                recentLogsTbody.innerHTML = '';
+                recentLogs.forEach(log => {
+                    const dateStr = new Date(log.Timestamp).toLocaleString();
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 transition-colors';
+                    tr.innerHTML = `
+                        <td class="px-6 py-3 whitespace-nowrap text-sm text-slate-600">${dateStr}</td>
+                        <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-slate-800">${log.Category} <span class="text-xs text-slate-400">(${log.TimeZoneFilter})</span></td>
+                        <td class="px-6 py-3 whitespace-nowrap text-sm text-blue-600 font-semibold">${log.TotalRecordsExported.toLocaleString()} numbers</td>
+                    `;
+                    recentLogsTbody.appendChild(tr);
+                });
+
+            } catch (error) {
+                console.error("Dashboard error:", error);
+                recentLogsTbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm text-red-500">Failed to load dashboard data.</td></tr>';
+            }
+        }
+    </script>
+</body>
+</html>
