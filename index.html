@@ -102,7 +102,7 @@
                     <h2 class="text-2xl font-semibold text-slate-800">Maaz International - BPO Cold Calling Dashboard</h2>
                 </div>
             </header>
-            <!-- Scrollable View Container -->
+            
             <div class="flex-1 overflow-y-auto p-8">
                 
                 <!-- Tab: Overview / Dashboard -->
@@ -154,7 +154,7 @@
                                 <thead class="bg-slate-50">
                                     <tr>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Category & Timezone</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Datapacket & Timezone</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Numbers Exported</th>
                                     </tr>
                                 </thead>
@@ -168,6 +168,7 @@
 
                 <!-- Tab: Datapackets Details -->
                 <div id="view-datapackets" class="tab-content max-w-5xl mx-auto">
+                    
                     <div id="dp-list-container" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
                         <div class="px-6 py-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                             <div>
@@ -199,8 +200,8 @@
                     <div id="dp-details-container" class="hidden space-y-6">
                         <div class="flex items-center justify-between mb-2">
                             <div>
-                                <h2 class="text-2xl font-bold text-slate-800" id="dp-details-title">Packet Details</h2>
-                                <p class="text-sm text-slate-500 mt-1">Detailed breakdown by timezone and state.</p>
+                                <h2 class="text-2xl font-bold text-slate-800" id="dp-details-title">Datapacket Details</h2>
+                                <p class="text-sm text-slate-500 mt-1">Detailed breakdown by timezone and state. Delete specific timezones if necessary.</p>
                             </div>
                             <button onclick="hideDatapacketDetails()" class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
@@ -255,11 +256,11 @@
                         <div class="p-6">
                             <form id="upload-form" class="space-y-6">
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-2">Category (Select existing or create new)</label>
-                                    <select id="upload-category-select" onchange="toggleNewCategoryInput()" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white mb-2">
-                                        <option value="">Loading categories...</option>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Datapacket (Select existing or create new)</label>
+                                    <select id="upload-datapacket-select" onchange="toggleNewDatapacketInput()" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white mb-2">
+                                        <option value="">Loading datapackets...</option>
                                     </select>
-                                    <input type="text" id="upload-category-new" class="hidden w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="Enter new dataset category name">
+                                    <input type="text" id="upload-datapacket-new" class="hidden w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="Enter new dataset datapacket name">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-2">Excel File (.xlsx)</label>
@@ -290,23 +291,24 @@
                     </div>
                 </div>
 
+                <!-- Tab: Export Data -->
                 <div id="view-export" class="tab-content max-w-4xl mx-auto">
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
                             <div>
                                 <h3 class="text-lg font-semibold text-slate-800">Export Leads Data</h3>
-                                <p class="text-sm text-slate-500 mt-1">Filter your processed lists by category and timezone to generate targeted calling lists.</p>
+                                <p class="text-sm text-slate-500 mt-1">Filter your processed lists by datapacket and timezone to generate targeted calling lists.</p>
                             </div>
-                            <button onclick="loadCategoriesForExport()" class="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-50" title="Refresh Categories">
+                            <button onclick="loadDatapacketsForExport()" class="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-50" title="Refresh Datapackets">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             </button>
                         </div>
                         <div class="p-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-2">Select Category</label>
-                                    <select id="export-category" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
-                                        <option value="">Loading categories...</option>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Select Datapacket</label>
+                                    <select id="export-datapacket" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
+                                        <option value="">Loading datapackets...</option>
                                     </select>
                                 </div>
                                 <div>
@@ -334,6 +336,7 @@
                     </div>
                 </div>
 
+                <!-- Tab: Export Logs -->
                 <div id="view-logs" class="tab-content max-w-5xl mx-auto">
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full">
                         <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -351,7 +354,7 @@
                                 <thead class="bg-slate-50">
                                     <tr>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Timestamp</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Category Extracted</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Datapacket Extracted</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Timezone Filter</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Total Records</th>
                                     </tr>
@@ -368,6 +371,7 @@
         </main>
     </div>
 
+    <!-- Loading Spinner Overlay -->
     <div id="loader-overlay" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm items-center justify-center flex-col">
         <svg class="animate-spin h-12 w-12 text-white mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -379,7 +383,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, query, where, orderBy, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, query, where, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'maaz-bpo-app';
         
@@ -400,7 +404,7 @@
 
         const leadsCollectionPath = `artifacts/${appId}/public/data/leads`;
         const exportLogsCollectionPath = `artifacts/${appId}/public/data/export_logs`;
-        const metaCollectionPath = `artifacts/${appId}/public/data/metadata`; 
+        const metaCollectionPath = `artifacts/${appId}/public/data/metadata`;
 
         let isFirebaseReady = false;
 
@@ -460,19 +464,17 @@
             activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
 
             document.querySelectorAll('.tab-content').forEach(view => view.classList.remove('active'));
-            
             document.getElementById(`view-${tabName}`).classList.add('active');
 
-            // View-specific actions
             if (tabName === 'overview') loadDashboardData();
             if (tabName === 'datapackets') loadDatapacketsList();
-            if (tabName === 'export') loadCategoriesForExport();
+            if (tabName === 'export') loadDatapacketsForExport();
             if (tabName === 'logs') loadExportLogs();
         }
 
-        window.toggleNewCategoryInput = function() {
-            const select = document.getElementById('upload-category-select');
-            const input = document.getElementById('upload-category-new');
+        window.toggleNewDatapacketInput = function() {
+            const select = document.getElementById('upload-datapacket-select');
+            const input = document.getElementById('upload-datapacket-new');
             if (select.value === '_NEW_') {
                 input.classList.remove('hidden');
                 input.required = true;
@@ -487,7 +489,7 @@
             try {
                 await signInAnonymously(auth);
                 isFirebaseReady = true;
-                loadCategoriesForExport();
+                loadDatapacketsForExport();
                 loadDashboardData();
             } catch (error) {
                 console.error("Firebase Auth Error: ", error);
@@ -567,13 +569,13 @@
             e.preventDefault();
             if (!isFirebaseReady) return Swal.fire('Error', 'Database not connected yet.', 'error');
             
-            let category = document.getElementById('upload-category-select').value;
-            if (category === '_NEW_') {
-                category = document.getElementById('upload-category-new').value.trim();
+            let datapacket = document.getElementById('upload-datapacket-select').value;
+            if (datapacket === '_NEW_') {
+                datapacket = document.getElementById('upload-datapacket-new').value.trim();
             }
             
-            if (!category) {
-                return Swal.fire('Missing Details', 'Please select or create a category name.', 'warning');
+            if (!datapacket) {
+                return Swal.fire('Missing Details', 'Please select or create a datapacket name.', 'warning');
             }
 
             const fileInput = document.getElementById('upload-file');
@@ -616,7 +618,7 @@
                             internalSet.add(number);
                             processedRecords.push({
                                 PhoneNumber: number,
-                                Category: category,
+                                Datapacket: datapacket, // Changed from Category
                                 AreaCode: areaCode,
                                 State: state,
                                 TimeZone: tz,
@@ -628,8 +630,8 @@
 
                     showLoader('Checking existing database records...');
                     const leadsRef = collection(db, leadsCollectionPath);
-                    const categoryQuery = query(leadsRef, where("Category", "==", category));
-                    const existingDocs = await getDocs(categoryQuery);
+                    const datapacketQuery = query(leadsRef, where("Datapacket", "==", datapacket));
+                    const existingDocs = await getDocs(datapacketQuery);
                     
                     const dbSet = new Set();
                     existingDocs.forEach(doc => {
@@ -652,7 +654,7 @@
                         }
                     }
 
-                    await updateCategoriesMeta(category);
+                    await updateDatapacketsMeta(datapacket);
 
                     hideLoader();
                     document.getElementById('upload-form').reset();
@@ -668,76 +670,243 @@
             reader.readAsBinaryString(file);
         });
 
-        async function updateCategoriesMeta(newCategory) {
+        async function updateDatapacketsMeta(newDatapacket) {
             try {
-                const metaDocRef = doc(db, metaCollectionPath, 'categoriesList');
+                const metaDocRef = doc(db, metaCollectionPath, 'datapacketsList');
                 const metaDoc = await getDoc(metaDocRef);
                 
-                let categories = [];
+                let datapackets = [];
                 if (metaDoc.exists()) {
-                    categories = metaDoc.data().list || [];
+                    datapackets = metaDoc.data().list || [];
                 }
 
-                if (!categories.includes(newCategory)) {
-                    categories.push(newCategory);
-                    await setDoc(metaDocRef, { list: categories });
+                if (!datapackets.includes(newDatapacket)) {
+                    datapackets.push(newDatapacket);
+                    await setDoc(metaDocRef, { list: datapackets });
                 }
             } catch (err) {
-                console.error("Error updating categories meta", err);
+                console.error("Error updating datapackets meta", err);
             }
         }
 
-        window.loadCategoriesForExport = async function() {
+        window.loadDatapacketsList = async function() {
             if (!isFirebaseReady) return;
-            const exportSelect = document.getElementById('export-category');
-            const uploadSelect = document.getElementById('upload-category-select');
+            const tbody = document.getElementById('datapackets-table-body');
+            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500">Loading datapackets...</td></tr>';
+            try {
+                const metaDocRef = doc(db, metaCollectionPath, 'datapacketsList');
+                const metaDoc = await getDoc(metaDocRef);
+                let datapackets = metaDoc.exists() ? metaDoc.data().list || [] : [];
+                
+                if(datapackets.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500">No datapackets found. Upload leads to create one.</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = '';
+                for (let i = 0; i < datapackets.length; i++) {
+                    const dpName = datapackets[i];
+                    
+                    // Count leads per datapacket for the table view
+                    const q = query(collection(db, leadsCollectionPath), where("Datapacket", "==", dpName));
+                    const snap = await getDocs(q);
+                    const count = snap.size;
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 transition-colors';
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${i + 1}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800">${dpName}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-semibold">${count.toLocaleString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                            <button onclick="viewDatapacket('${dpName}')" class="text-blue-600 hover:text-blue-900 transition-colors">View / Edit</button>
+                            <button onclick="deleteDatapacket('${dpName}')" class="text-red-600 hover:text-red-900 transition-colors">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-sm text-red-500">Error loading data.</td></tr>';
+            }
+        };
+
+        window.viewDatapacket = async function(dpName) {
+            document.getElementById('dp-list-container').classList.add('hidden');
+            document.getElementById('dp-details-container').classList.remove('hidden');
+            document.getElementById('dp-details-title').innerText = `Datapacket: ${dpName}`;
+
+            const tzGrid = document.getElementById('dp-tz-grid');
+            const stateBody = document.getElementById('dp-state-body');
+            document.getElementById('dp-stat-total').innerText = '...';
+            tzGrid.innerHTML = '<div class="col-span-5 text-sm text-slate-500">Loading timezone breakdown...</div>';
+            stateBody.innerHTML = '<tr><td colspan="2" class="px-6 py-4 text-center text-sm text-slate-500">Loading state data...</td></tr>';
+
+            try {
+                const q = query(collection(db, leadsCollectionPath), where("Datapacket", "==", dpName));
+                const snap = await getDocs(q);
+
+                let total = 0;
+                let tzCounts = { 'EST': 0, 'CST': 0, 'MST': 0, 'PST': 0, 'Unknown': 0 };
+                let stateCounts = {};
+
+                snap.forEach(doc => {
+                    total++;
+                    const data = doc.data();
+                    const tz = data.TimeZone;
+                    const state = data.State;
+                    if (tzCounts[tz] !== undefined) tzCounts[tz]++; else tzCounts['Unknown']++;
+                    if (!stateCounts[state]) stateCounts[state] = 0;
+                    stateCounts[state]++;
+                });
+
+                document.getElementById('dp-stat-total').innerText = total.toLocaleString();
+
+                tzGrid.innerHTML = Object.keys(tzCounts).map(tz => `
+                    <div class="bg-slate-50 rounded-lg p-3 border border-slate-100 flex flex-col items-center relative group">
+                        <div class="text-xs text-slate-500 uppercase">${tz}</div>
+                        <div class="text-xl font-bold text-slate-700">${tzCounts[tz].toLocaleString()}</div>
+                        ${tzCounts[tz] > 0 ? `<button onclick="deleteTimezoneFromDatapacket('${dpName}', '${tz}')" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600" title="Delete ALL ${tz} leads in this packet"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>` : ''}
+                    </div>
+                `).join('');
+
+                stateBody.innerHTML = Object.keys(stateCounts).sort().map(state => `
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-slate-800">${state}</td>
+                        <td class="px-6 py-3 whitespace-nowrap text-sm text-slate-600">${stateCounts[state].toLocaleString()}</td>
+                    </tr>
+                `).join('');
+
+            } catch (e) {
+                console.error(e);
+                Swal.fire('Error', 'Failed to load datapacket details.', 'error');
+            }
+        };
+
+        window.hideDatapacketDetails = function() {
+            document.getElementById('dp-details-container').classList.add('hidden');
+            document.getElementById('dp-list-container').classList.remove('hidden');
+        };
+
+        window.deleteDatapacket = async function(dpName) {
+            const result = await Swal.fire({
+                title: `Delete ${dpName}?`, text: "All leads attached to this datapacket will be permanently deleted.", icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Yes, delete it!'
+            });
+            
+            if (result.isConfirmed) {
+                showLoader(`Deleting Datapacket: ${dpName}...`);
+                try {
+                    const q = query(collection(db, leadsCollectionPath), where("Datapacket", "==", dpName));
+                    const snap = await getDocs(q);
+                    
+                    let i = 0;
+                    for (const document of snap.docs) {
+                        await deleteDoc(doc(db, leadsCollectionPath, document.id));
+                        i++;
+                        if(i % 50 === 0) document.getElementById('loader-text').innerText = `Deleted ${i} leads...`;
+                    }
+
+                    const metaDocRef = doc(db, metaCollectionPath, 'datapacketsList');
+                    const metaDoc = await getDoc(metaDocRef);
+                    if (metaDoc.exists()) {
+                        let dps = metaDoc.data().list || [];
+                        dps = dps.filter(d => d !== dpName);
+                        await setDoc(metaDocRef, { list: dps });
+                    }
+
+                    hideLoader();
+                    Swal.fire('Deleted!', 'The datapacket has been removed entirely.', 'success');
+                    loadDatapacketsList(); 
+                } catch (e) {
+                    console.error(e);
+                    hideLoader();
+                    Swal.fire('Error', 'Failed to delete datapacket.', 'error');
+                }
+            }
+        };
+
+        window.deleteTimezoneFromDatapacket = async function(dpName, tz) {
+             const result = await Swal.fire({
+                title: `Delete ${tz} leads?`, text: `Remove all ${tz} timezone leads from the ${dpName} datapacket?`, icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Yes, delete them'
+            });
+            if (result.isConfirmed) {
+                showLoader(`Deleting ${tz} leads...`);
+                try {
+                    const q = query(collection(db, leadsCollectionPath), where("Datapacket", "==", dpName));
+                    const snap = await getDocs(q);
+                    
+                    let i = 0;
+                    for (const document of snap.docs) {
+                        if (document.data().TimeZone === tz) {
+                            await deleteDoc(doc(db, leadsCollectionPath, document.id));
+                            i++;
+                            if(i % 50 === 0) document.getElementById('loader-text').innerText = `Deleted ${i} leads...`;
+                        }
+                    }
+                    hideLoader();
+                    Swal.fire('Deleted!', `Successfully removed ${i} leads mapped to ${tz}.`, 'success');
+                    viewDatapacket(dpName); 
+                } catch (e) {
+                    console.error(e);
+                    hideLoader();
+                    Swal.fire('Error', 'Failed to delete leads.', 'error');
+                }
+            }
+        };
+
+        window.loadDatapacketsForExport = async function() {
+            if (!isFirebaseReady) return;
+            const exportSelect = document.getElementById('export-datapacket');
+            const uploadSelect = document.getElementById('upload-datapacket-select');
             
             exportSelect.innerHTML = '<option value="">Loading...</option>';
             if (uploadSelect) uploadSelect.innerHTML = '<option value="">Loading...</option>';
             
             try {
-                const metaDocRef = doc(db, metaCollectionPath, 'categoriesList');
+                const metaDocRef = doc(db, metaCollectionPath, 'datapacketsList');
                 const metaDoc = await getDoc(metaDocRef);
                 
-                exportSelect.innerHTML = '<option value="">-- Select a Category --</option>';
-                if (uploadSelect) uploadSelect.innerHTML = '<option value="">-- Select Category --</option><option value="_NEW_" class="font-semibold text-blue-700">+ Create New Category</option>';
+                exportSelect.innerHTML = '<option value="">-- Select a Datapacket --</option>';
+                if (uploadSelect) uploadSelect.innerHTML = '<option value="">-- Select Datapacket --</option><option value="_NEW_" class="font-semibold text-blue-700">+ Create New Datapacket</option>';
 
                 if (metaDoc.exists() && metaDoc.data().list) {
-                    const categories = metaDoc.data().list;
-                    categories.forEach(cat => {
+                    const datapackets = metaDoc.data().list;
+                    datapackets.forEach(dp => {
                         const optExport = document.createElement('option');
-                        optExport.value = cat; optExport.innerText = cat;
+                        optExport.value = dp; optExport.innerText = dp;
                         exportSelect.appendChild(optExport);
                         
                         if (uploadSelect) {
                             const optUpload = document.createElement('option');
-                            optUpload.value = cat; optUpload.innerText = cat;
+                            optUpload.value = dp; optUpload.innerText = dp;
                             uploadSelect.appendChild(optUpload);
                         }
                     });
                 } else {
-                    exportSelect.innerHTML = '<option value="">No categories found</option>';
+                    exportSelect.innerHTML = '<option value="">No datapackets found</option>';
                 }
             } catch (err) {
-                console.error("Error loading categories", err);
-                exportSelect.innerHTML = '<option value="">Error loading categories</option>';
+                console.error("Error loading datapackets", err);
+                exportSelect.innerHTML = '<option value="">Error loading datapackets</option>';
             }
         }
 
         window.handleExport = async function() {
             if (!isFirebaseReady) return;
-            const category = document.getElementById('export-category').value;
+            const datapacket = document.getElementById('export-datapacket').value;
             const timezone = document.getElementById('export-timezone').value;
 
-            if (!category) {
-                return Swal.fire('Hold on', 'Please select a Category first.', 'warning');
+            if (!datapacket) {
+                return Swal.fire('Hold on', 'Please select a Datapacket first.', 'warning');
             }
 
             try {
                 showLoader('Extracting Data from Database...');
                 
                 const leadsRef = collection(db, leadsCollectionPath);
-                const exportQuery = query(leadsRef, where("Category", "==", category));
+                const exportQuery = query(leadsRef, where("Datapacket", "==", datapacket));
                 const snapshot = await getDocs(exportQuery);
 
                 const exportData = [];
@@ -776,15 +945,15 @@
                 const workbook = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
                 
-                const fileName = `Export_${category}_${timezone}_${new Date().getTime()}.xlsx`;
+                const fileName = `Export_${datapacket}_${timezone}_${new Date().getTime()}.xlsx`;
                 XLSX.writeFile(workbook, fileName);
 
-                await logExportActivity(category, timezone, finalExportData.length);
+                await logExportActivity(datapacket, timezone, finalExportData.length);
 
                 hideLoader();
                 Swal.fire('Export Complete', `${finalExportData.length} leads successfully exported.`, 'success');
 
-                loadDashboardData();
+                loadDashboardData(); // Update dashboard logs table
 
             } catch (error) {
                 console.error("Export error:", error);
@@ -793,12 +962,12 @@
             }
         }
 
-        async function logExportActivity(category, timezone, count) {
+        async function logExportActivity(datapacket, timezone, count) {
             try {
                 const logsRef = collection(db, exportLogsCollectionPath);
                 await addDoc(logsRef, {
                     Timestamp: new Date().toISOString(),
-                    Category: category,
+                    Datapacket: datapacket,
                     TimeZoneFilter: timezone,
                     TotalRecordsExported: count,
                     ExportedBy: "Admin"
@@ -834,7 +1003,7 @@
                     tr.className = 'hover:bg-slate-50 transition-colors';
                     tr.innerHTML = `
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${dateStr}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800">${log.Category}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800">${log.Datapacket}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">${log.TimeZoneFilter}</span>
                         </td>
@@ -903,7 +1072,7 @@
                     tr.className = 'hover:bg-slate-50 transition-colors';
                     tr.innerHTML = `
                         <td class="px-6 py-3 whitespace-nowrap text-sm text-slate-600">${dateStr}</td>
-                        <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-slate-800">${log.Category} <span class="text-xs text-slate-400">(${log.TimeZoneFilter})</span></td>
+                        <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-slate-800">${log.Datapacket} <span class="text-xs text-slate-400">(${log.TimeZoneFilter})</span></td>
                         <td class="px-6 py-3 whitespace-nowrap text-sm text-blue-600 font-semibold">${log.TotalRecordsExported.toLocaleString()} numbers</td>
                     `;
                     recentLogsTbody.appendChild(tr);
