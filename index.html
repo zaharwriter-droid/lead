@@ -459,6 +459,9 @@
             activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
 
             document.querySelectorAll('.tab-content').forEach(view => view.classList.remove('active'));
+            
+            document.getElementById(`view-${tabName}`).classList.add('active');
+
             // View-specific actions
             if (tabName === 'overview') loadDashboardData();
             if (tabName === 'datapackets') loadDatapacketsList();
