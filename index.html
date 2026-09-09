@@ -102,7 +102,7 @@
                     <h2 class="text-2xl font-semibold text-slate-800">Maaz International - BPO Cold Calling Dashboard</h2>
                 </div>
             </header>
-
+            <!-- Scrollable View Container -->
             <div class="flex-1 overflow-y-auto p-8">
                 
                 <!-- Tab: Overview / Dashboard -->
@@ -140,26 +140,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-8">
-                        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-                            <h3 class="text-md font-semibold text-slate-800">Leads by Category</h3>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-slate-200">
-                                <thead class="bg-slate-50">
-                                    <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Category Name</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Total Leads</th>
-                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="category-breakdown-body" class="bg-white divide-y divide-slate-200">
-                                    <tr><td colspan="3" class="px-6 py-4 text-center text-sm text-slate-500">Loading data...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
+                    <!-- Recent Exports Report -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                             <h3 class="text-md font-semibold text-slate-800">Recent Export Reports</h3>
@@ -187,26 +168,46 @@
 
                 <!-- Tab: Datapackets Details -->
                 <div id="view-datapackets" class="tab-content max-w-5xl mx-auto">
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
+                    <div id="dp-list-container" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
                         <div class="px-6 py-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                             <div>
-                                <h3 class="text-lg font-semibold text-slate-800">Datapackets Analysis</h3>
-                                <p class="text-sm text-slate-500 mt-1">Select a datapacket to view detailed metrics including timezone and state breakdowns.</p>
+                                <h3 class="text-lg font-semibold text-slate-800">Datapackets List</h3>
+                                <p class="text-sm text-slate-500 mt-1">View all available datapackets, their lead counts, and manage data.</p>
                             </div>
                             <button onclick="loadDatapacketsList()" class="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-50" title="Refresh Datapackets">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             </button>
                         </div>
-                        <div class="p-6">
-                            <label class="block text-sm font-medium text-slate-700 mb-2">Select Datapacket</label>
-                            <select id="datapacket-selector" onchange="loadDatapacketDetails(this.value)" class="w-full max-w-md px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
-                                <option value="">Loading...</option>
-                            </select>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-200">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">#</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Datapacket Name</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Total Leads</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="datapackets-table-body" class="bg-white divide-y divide-slate-200">
+                                    <tr><td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500">Loading data...</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
                     <!-- Datapacket Details Container -->
                     <div id="dp-details-container" class="hidden space-y-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <div>
+                                <h2 class="text-2xl font-bold text-slate-800" id="dp-details-title">Packet Details</h2>
+                                <p class="text-sm text-slate-500 mt-1">Detailed breakdown by timezone and state.</p>
+                            </div>
+                            <button onclick="hideDatapacketDetails()" class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                                Back to List
+                            </button>
+                        </div>
+
                         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-white">
                             <div class="text-slate-500 text-sm font-medium uppercase tracking-wider mb-2">Total Numbers in Datapacket</div>
                             <div id="dp-stat-total" class="text-4xl font-extrabold text-blue-700">0</div>
@@ -857,9 +858,6 @@
             document.getElementById('stat-mst').innerText = '...';
             document.getElementById('stat-pst').innerText = '...';
             
-            const categoryTbody = document.getElementById('category-breakdown-body');
-            categoryTbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm text-slate-500">Loading data...</td></tr>';
-
             const recentLogsTbody = document.getElementById('recent-logs-body');
             recentLogsTbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm text-slate-500">Loading data...</td></tr>';
 
@@ -869,19 +867,14 @@
                 
                 let total = 0;
                 let tzCounts = { 'EST': 0, 'CST': 0, 'MST': 0, 'PST': 0, 'Unknown': 0 };
-                let categoryCounts = {};
                 
                 leadsSnap.forEach(doc => {
                     total++;
                     const data = doc.data();
                     const tz = data.TimeZone;
-                    const cat = data.Category;
 
                     if (tzCounts[tz] !== undefined) tzCounts[tz]++;
                     else tzCounts['Unknown']++;
-
-                    if (categoryCounts[cat]) categoryCounts[cat]++;
-                    else categoryCounts[cat] = 1;
                 });
 
                 document.getElementById('stat-total').innerText = total.toLocaleString();
@@ -889,27 +882,6 @@
                 document.getElementById('stat-cst').innerText = tzCounts['CST'].toLocaleString();
                 document.getElementById('stat-mst').innerText = tzCounts['MST'].toLocaleString();
                 document.getElementById('stat-pst').innerText = tzCounts['PST'].toLocaleString();
-
-                categoryTbody.innerHTML = '';
-                if (Object.keys(categoryCounts).length === 0) {
-                    categoryTbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm text-slate-500">No categories found.</td></tr>';
-                } else {
-                    for (const [catName, count] of Object.entries(categoryCounts)) {
-                        const tr = document.createElement('tr');
-                        tr.className = 'hover:bg-slate-50 transition-colors';
-                        tr.innerHTML = `
-                            <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-slate-800">${catName}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-blue-600 font-semibold">${count.toLocaleString()}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-right">
-                                <button onclick="deleteCategoryData('${catName}')" class="text-red-500 hover:text-red-700 font-medium text-sm inline-flex items-center justify-end px-3 py-1 rounded-md hover:bg-red-50 transition-colors">
-                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    Delete
-                                </button>
-                            </td>
-                        `;
-                        categoryTbody.appendChild(tr);
-                    }
-                }
 
                 const logsRef = collection(db, exportLogsCollectionPath);
                 const logsSnap = await getDocs(logsRef);
@@ -942,181 +914,6 @@
                 recentLogsTbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm text-red-500">Failed to load dashboard data.</td></tr>';
             }
         }
-
-        window.deleteCategoryData = async function(categoryName) {
-            if (!isFirebaseReady) return;
-
-            const confirmResult = await Swal.fire({
-                title: 'Delete Category?',
-                text: `You are about to permanently delete ALL leads in "${categoryName}". This action cannot be undone!`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: 'Yes, Delete All'
-            });
-
-            if (confirmResult.isConfirmed) {
-                try {
-                    showLoader(`Fetching records for ${categoryName}...`);
-                    const leadsRef = collection(db, leadsCollectionPath);
-                    const q = query(leadsRef, where("Category", "==", categoryName));
-                    const snapshot = await getDocs(q);
-
-                    const totalToDelete = snapshot.size;
-                    
-                    if (totalToDelete === 0) {
-                        const metaDocRef = doc(db, metaCollectionPath, 'categoriesList');
-                        const metaDoc = await getDoc(metaDocRef);
-                        if (metaDoc.exists()) {
-                            let categories = metaDoc.data().list || [];
-                            categories = categories.filter(c => c !== categoryName);
-                            await setDoc(metaDocRef, { list: categories });
-                        }
-                        hideLoader();
-                        loadDashboardData();
-                        loadCategoriesForExport();
-                        Swal.fire('Cleaned Up', 'Category removed.', 'info');
-                        return;
-                    }
-
-                    showLoader(`Deleting ${totalToDelete} leads...`);
-                    let deletedCount = 0;
-                    
-                    for (const docSnapshot of snapshot.docs) {
-                        await deleteDoc(doc(db, leadsCollectionPath, docSnapshot.id));
-                        deletedCount++;
-                        if (deletedCount % 25 === 0) {
-                            document.getElementById('loader-text').innerText = `Deleted ${deletedCount} of ${totalToDelete} leads...`;
-                        }
-                    }
-
-                    document.getElementById('loader-text').innerText = `Updating system lists...`;
-                    const metaDocRef = doc(db, metaCollectionPath, 'categoriesList');
-                    const metaDoc = await getDoc(metaDocRef);
-                    if (metaDoc.exists()) {
-                        let categories = metaDoc.data().list || [];
-                        categories = categories.filter(c => c !== categoryName);
-                        await setDoc(metaDocRef, { list: categories });
-                    }
-
-                    hideLoader();
-                    Swal.fire('Deleted!', `Successfully deleted ${totalToDelete} leads from "${categoryName}".`, 'success');
-                    
-                    loadDashboardData();
-                    loadCategoriesForExport();
-
-                } catch (error) {
-                    console.error("Delete error:", error);
-                    hideLoader();
-                    Swal.fire('Error', 'Failed to delete category data.', 'error');
-                }
-            }
-        }
-
-        window.loadDatapacketsList = async function() {
-            if (!isFirebaseReady) return;
-            const selector = document.getElementById('datapacket-selector');
-            selector.innerHTML = '<option value="">Loading...</option>';
-            document.getElementById('dp-details-container').classList.add('hidden');
-            
-            try {
-                const metaDocRef = doc(db, metaCollectionPath, 'categoriesList');
-                const metaDoc = await getDoc(metaDocRef);
-                
-                selector.innerHTML = '<option value="">-- Select a Datapacket --</option>';
-
-                if (metaDoc.exists() && metaDoc.data().list) {
-                    const categories = metaDoc.data().list;
-                    categories.forEach(cat => {
-                        const opt = document.createElement('option');
-                        opt.value = cat; opt.innerText = cat;
-                        selector.appendChild(opt);
-                    });
-                } else {
-                    selector.innerHTML = '<option value="">No datapackets found</option>';
-                }
-            } catch (err) {
-                console.error("Error loading datapackets", err);
-                selector.innerHTML = '<option value="">Error loading data</option>';
-            }
-        };
-
-        window.loadDatapacketDetails = async function(packetName) {
-            if (!packetName) {
-                document.getElementById('dp-details-container').classList.add('hidden');
-                return;
-            }
-            if (!isFirebaseReady) return;
-
-            showLoader(`Analyzing ${packetName}...`);
-            document.getElementById('dp-details-container').classList.remove('hidden');
-
-            try {
-                const leadsRef = collection(db, leadsCollectionPath);
-                const q = query(leadsRef, where("Category", "==", packetName));
-                const snapshot = await getDocs(q);
-
-                let total = 0;
-                let tzStats = { 'EST': 0, 'CST': 0, 'MST': 0, 'PST': 0, 'Unknown': 0 };
-                let stateStats = {};
-
-                snapshot.forEach(doc => {
-                    total++;
-                    const data = doc.data();
-                    const tz = data.TimeZone || 'Unknown';
-                    const state = data.State || 'Unknown';
-
-                    if (tzStats[tz] !== undefined) tzStats[tz]++;
-                    else tzStats['Unknown']++;
-
-                    if (stateStats[state]) stateStats[state]++;
-                    else stateStats[state] = 1;
-                });
-
-                // Update Total Count
-                document.getElementById('dp-stat-total').innerText = total.toLocaleString();
-
-                // Render Timezones Grid
-                const tzGrid = document.getElementById('dp-tz-grid');
-                tzGrid.innerHTML = '';
-                for (const [tz, count] of Object.entries(tzStats)) {
-                    tzGrid.innerHTML += `
-                        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
-                            <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">${tz}</div>
-                            <div class="text-2xl font-bold text-slate-700">${count.toLocaleString()}</div>
-                        </div>
-                    `;
-                }
-
-                // Render States List (sorted by highest count)
-                const stateBody = document.getElementById('dp-state-body');
-                stateBody.innerHTML = '';
-                
-                const sortedStates = Object.entries(stateStats).sort((a, b) => b[1] - a[1]);
-                
-                if (sortedStates.length === 0) {
-                    stateBody.innerHTML = '<tr><td colspan="2" class="px-6 py-4 text-center text-sm text-slate-500">No state data available.</td></tr>';
-                } else {
-                    sortedStates.forEach(([state, count]) => {
-                        stateBody.innerHTML += `
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-slate-800">${state}</td>
-                                <td class="px-6 py-3 whitespace-nowrap text-sm text-blue-600 font-semibold">${count.toLocaleString()}</td>
-                            </tr>
-                        `;
-                    });
-                }
-
-                hideLoader();
-
-            } catch (error) {
-                console.error("Error analyzing datapacket:", error);
-                hideLoader();
-                Swal.fire('Error', 'Failed to load datapacket details.', 'error');
-                document.getElementById('dp-details-container').classList.add('hidden');
-            }
-        };
     </script>
 </body>
 </html>
