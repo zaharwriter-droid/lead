@@ -64,6 +64,10 @@
                     <svg class="mr-3 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                     Overview
                 </button>
+                <button onclick="switchTab('datapackets')" id="nav-datapackets" class="nav-btn w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-800 hover:text-white text-slate-300 transition-colors">
+                    <svg class="mr-3 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    Datapackets
+                </button>
                 <button onclick="switchTab('upload')" id="nav-upload" class="nav-btn w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-800 hover:text-white text-slate-300 transition-colors">
                     <svg class="mr-3 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                     Upload Leads
@@ -93,14 +97,12 @@
         </aside>
 
         <main class="flex-1 flex flex-col h-full bg-slate-50 overflow-hidden">
-            <!-- Header -->
             <header class="bg-white shadow-sm z-0">
                 <div class="px-8 py-5 flex items-center justify-between">
                     <h2 class="text-2xl font-semibold text-slate-800">Maaz International - BPO Cold Calling Dashboard</h2>
                 </div>
             </header>
 
-            <!-- Scrollable View Container -->
             <div class="flex-1 overflow-y-auto p-8">
                 
                 <!-- Tab: Overview / Dashboard -->
@@ -109,13 +111,11 @@
                     <div class="mb-8">
                         <h3 class="text-xl font-bold text-slate-800 mb-4">System Overview</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <!-- Total Leads -->
                             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col items-center justify-center col-span-1 md:col-span-3 lg:col-span-1 bg-gradient-to-br from-blue-50 to-white">
                                 <div class="text-slate-500 text-sm font-medium uppercase tracking-wider mb-2">Total Leads In Database</div>
                                 <div id="stat-total" class="text-4xl font-extrabold text-blue-700">0</div>
                             </div>
                             
-                            <!-- Timezones Breakdown -->
                             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 col-span-1 md:col-span-3 lg:col-span-2">
                                 <div class="text-slate-800 text-sm font-semibold mb-4 border-b pb-2">Leads Available by Timezone</div>
                                 <div class="grid grid-cols-4 gap-4 text-center">
@@ -140,7 +140,6 @@
                         </div>
                     </div>
 
-                    <!-- Leads by Category Breakdown -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-8">
                         <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                             <h3 class="text-md font-semibold text-slate-800">Leads by Category</h3>
@@ -161,7 +160,6 @@
                         </div>
                     </div>
 
-                    <!-- Recent Exports Report -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                             <h3 class="text-md font-semibold text-slate-800">Recent Export Reports</h3>
@@ -183,6 +181,65 @@
                                     <tr><td colspan="3" class="px-6 py-4 text-center text-sm text-slate-500">Loading data...</td></tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Datapackets Details -->
+                <div id="view-datapackets" class="tab-content max-w-5xl mx-auto">
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
+                        <div class="px-6 py-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-800">Datapackets Analysis</h3>
+                                <p class="text-sm text-slate-500 mt-1">Select a datapacket to view detailed metrics including timezone and state breakdowns.</p>
+                            </div>
+                            <button onclick="loadDatapacketsList()" class="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-50" title="Refresh Datapackets">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            </button>
+                        </div>
+                        <div class="p-6">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Select Datapacket</label>
+                            <select id="datapacket-selector" onchange="loadDatapacketDetails(this.value)" class="w-full max-w-md px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white">
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Datapacket Details Container -->
+                    <div id="dp-details-container" class="hidden space-y-6">
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-white">
+                            <div class="text-slate-500 text-sm font-medium uppercase tracking-wider mb-2">Total Numbers in Datapacket</div>
+                            <div id="dp-stat-total" class="text-4xl font-extrabold text-blue-700">0</div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+                                <h3 class="text-md font-semibold text-slate-800">Timezone Breakdown</h3>
+                            </div>
+                            <div class="p-6">
+                                <div id="dp-tz-grid" class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+                                <h3 class="text-md font-semibold text-slate-800">State Breakdown</h3>
+                            </div>
+                            <div class="overflow-x-auto max-h-96">
+                                <table class="min-w-full divide-y divide-slate-200 relative">
+                                    <thead class="bg-slate-50 sticky top-0 shadow-sm">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">State Code</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Total Numbers</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dp-state-body" class="bg-white divide-y divide-slate-200">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -232,7 +289,6 @@
                     </div>
                 </div>
 
-                <!-- Tab: Export Data -->
                 <div id="view-export" class="tab-content max-w-4xl mx-auto">
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
@@ -277,7 +333,6 @@
                     </div>
                 </div>
 
-                <!-- Tab: Export Logs -->
                 <div id="view-logs" class="tab-content max-w-5xl mx-auto">
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full">
                         <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -301,7 +356,6 @@
                                     </tr>
                                 </thead>
                                 <tbody id="logs-table-body" class="bg-white divide-y divide-slate-200">
-                                    <!-- Logs injected via JS -->
                                     <tr><td colspan="4" class="px-6 py-10 text-center text-sm text-slate-500">Loading logs...</td></tr>
                                 </tbody>
                             </table>
@@ -313,7 +367,6 @@
         </main>
     </div>
 
-    <!-- Loading Spinner Overlay -->
     <div id="loader-overlay" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm items-center justify-center flex-col">
         <svg class="animate-spin h-12 w-12 text-white mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -325,13 +378,10 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        // Included deleteDoc for the new Delete Category feature
         import { getFirestore, collection, addDoc, getDocs, doc, setDoc, query, where, orderBy, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Handle Sandbox Environment App ID & Configurations
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'maaz-bpo-app';
         
-        // User provided config falling back to environment config if applicable
         const customFirebaseConfig = {
             apiKey: "AIzaSyAgwMd4nibgj5DfPmTVak_26GFPqXuDHEo",
             authDomain: "data-management-44b28.firebaseapp.com",
@@ -343,26 +393,22 @@
         };
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : customFirebaseConfig;
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Strict Paths mapping based on mandatory rule 1
         const leadsCollectionPath = `artifacts/${appId}/public/data/leads`;
         const exportLogsCollectionPath = `artifacts/${appId}/public/data/export_logs`;
-        const metaCollectionPath = `artifacts/${appId}/public/data/metadata`; // For storing unique categories list
+        const metaCollectionPath = `artifacts/${appId}/public/data/metadata`; 
 
         let isFirebaseReady = false;
 
-        // Hardcoded Credentials
         const ADMIN_EMAIL = 'm.m.raza2932@gmail.com';
         const ADMIN_PASS = 'Maaz@2026';
 
         window.onload = async () => {
             checkSession();
             
-            // File input name update
             document.getElementById('upload-file').addEventListener('change', function(e) {
                 const fileName = e.target.files[0]?.name || 'XLSX up to 10MB';
                 document.getElementById('file-name-display').innerText = fileName;
@@ -404,7 +450,6 @@
         }
 
         window.switchTab = function(tabName) {
-            // Update Navigation UI
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('bg-blue-600', 'text-white');
                 btn.classList.add('hover:bg-slate-800', 'hover:text-white', 'text-slate-300');
@@ -413,12 +458,10 @@
             activeBtn.classList.add('bg-blue-600', 'text-white');
             activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
 
-            // Update View Content
             document.querySelectorAll('.tab-content').forEach(view => view.classList.remove('active'));
-            document.getElementById(`view-${tabName}`).classList.add('active');
-
             // View-specific actions
             if (tabName === 'overview') loadDashboardData();
+            if (tabName === 'datapackets') loadDatapacketsList();
             if (tabName === 'export') loadCategoriesForExport();
             if (tabName === 'logs') loadExportLogs();
         }
@@ -436,12 +479,10 @@
             }
         }
 
-        // Initialize Firebase Anonymously in Background (Mandatory Rule 3)
         async function initFirebaseBackground() {
             try {
                 await signInAnonymously(auth);
                 isFirebaseReady = true;
-                // Pre-load data
                 loadCategoriesForExport();
                 loadDashboardData();
             } catch (error) {
@@ -459,7 +500,6 @@
             document.getElementById('loader-overlay').classList.remove('active');
         }
 
-        // Comprehensive US/Canada Area Code mapping to States
         const areaCodeToState = {
             "201": "NJ", "202": "DC", "203": "CT", "205": "AL", "206": "WA", "207": "ME", "208": "ID", "209": "CA",
             "210": "TX", "212": "NY", "213": "CA", "214": "TX", "215": "PA", "216": "OH", "217": "IL", "218": "MN",
@@ -508,10 +548,9 @@
         };
 
         function mapPhoneData(phoneString) {
-            const cleanPhone = phoneString.replace(/\D/g, ''); // strip non-numeric
+            const cleanPhone = phoneString.replace(/\D/g, ''); 
             if (cleanPhone.length < 10) return { number: cleanPhone, areaCode: "Unknown", state: "Unknown", tz: "Unknown" };
             
-            // Handle optional country code 1
             const tenDigit = cleanPhone.length === 11 && cleanPhone.startsWith('1') ? cleanPhone.substring(1) : cleanPhone;
             const areaCode = tenDigit.substring(0, 3);
             const state = areaCodeToState[areaCode] || "Unknown";
@@ -552,7 +591,6 @@
 
                     showLoader('Analyzing Data & Deduplicating...');
 
-                    // 1. Identify Phone Column intelligently
                     let phoneKey = null;
                     const keys = Object.keys(rawJson[0]);
                     for (let key of keys) {
@@ -560,9 +598,8 @@
                             phoneKey = key; break;
                         }
                     }
-                    if (!phoneKey) phoneKey = keys[0]; // fallback to first column
+                    if (!phoneKey) phoneKey = keys[0]; 
 
-                    // 2. Process and Internal Deduplication
                     const processedRecords = [];
                     const internalSet = new Set();
 
@@ -585,7 +622,6 @@
                         }
                     });
 
-                    // 3. Database Deduplication 
                     showLoader('Checking existing database records...');
                     const leadsRef = collection(db, leadsCollectionPath);
                     const categoryQuery = query(leadsRef, where("Category", "==", category));
@@ -603,7 +639,6 @@
                         return Swal.fire('Completed', 'No new unique records found. All numbers were duplicates.', 'info');
                     }
 
-                    // 4. Batch Saving to Firestore 
                     showLoader(`Saving ${finalUniqueRecords.length} new records...`);
                     
                     for(let i=0; i<finalUniqueRecords.length; i++){
@@ -613,7 +648,6 @@
                         }
                     }
 
-                    // 5. Update Categories Metadata
                     await updateCategoriesMeta(category);
 
                     hideLoader();
@@ -630,7 +664,6 @@
             reader.readAsBinaryString(file);
         });
 
-        // Maintain a single document for categories
         async function updateCategoriesMeta(newCategory) {
             try {
                 const metaDocRef = doc(db, metaCollectionPath, 'categoriesList');
@@ -707,7 +740,6 @@
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     if (timezone === 'All' || data.TimeZone === timezone) {
-                        // Reconstruct flattened object for excel
                         let original = {};
                         try { original = JSON.parse(data.OriginalData); } catch(e){}
                         
@@ -726,7 +758,6 @@
                     return Swal.fire('No Results', 'No records found matching your filters.', 'info');
                 }
 
-                // Apply Quantity Limit if specified
                 const quantityInput = document.getElementById('export-quantity').value;
                 const limit = parseInt(quantityInput);
                 let finalExportData = exportData;
@@ -737,7 +768,6 @@
 
                 showLoader('Generating Excel File...');
 
-                // Create and Download Excel via SheetJS
                 const worksheet = XLSX.utils.json_to_sheet(finalExportData);
                 const workbook = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
@@ -745,13 +775,11 @@
                 const fileName = `Export_${category}_${timezone}_${new Date().getTime()}.xlsx`;
                 XLSX.writeFile(workbook, fileName);
 
-                // Log the export
                 await logExportActivity(category, timezone, finalExportData.length);
 
                 hideLoader();
                 Swal.fire('Export Complete', `${finalExportData.length} leads successfully exported.`, 'success');
 
-                // Refresh dashboard automatically in background
                 loadDashboardData();
 
             } catch (error) {
@@ -788,7 +816,6 @@
                 let logs = [];
                 snapshot.forEach(doc => logs.push(doc.data()));
                 
-                // Sort descending by Timestamp
                 logs.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
 
                 if (logs.length === 0) {
@@ -821,7 +848,6 @@
         window.loadDashboardData = async function() {
             if (!isFirebaseReady) return;
             
-            // Set Loading States
             document.getElementById('stat-total').innerText = '...';
             document.getElementById('stat-est').innerText = '...';
             document.getElementById('stat-cst').innerText = '...';
@@ -835,7 +861,6 @@
             recentLogsTbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm text-slate-500">Loading data...</td></tr>';
 
             try {
-                // Fetch Leads for Stats
                 const leadsRef = collection(db, leadsCollectionPath);
                 const leadsSnap = await getDocs(leadsRef);
                 
@@ -856,14 +881,12 @@
                     else categoryCounts[cat] = 1;
                 });
 
-                // Update UI Stats securely
                 document.getElementById('stat-total').innerText = total.toLocaleString();
                 document.getElementById('stat-est').innerText = tzCounts['EST'].toLocaleString();
                 document.getElementById('stat-cst').innerText = tzCounts['CST'].toLocaleString();
                 document.getElementById('stat-mst').innerText = tzCounts['MST'].toLocaleString();
                 document.getElementById('stat-pst').innerText = tzCounts['PST'].toLocaleString();
 
-                // Render Category Breakdown
                 categoryTbody.innerHTML = '';
                 if (Object.keys(categoryCounts).length === 0) {
                     categoryTbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm text-slate-500">No categories found.</td></tr>';
@@ -885,14 +908,13 @@
                     }
                 }
 
-                // Fetch Recent Export Logs
                 const logsRef = collection(db, exportLogsCollectionPath);
                 const logsSnap = await getDocs(logsRef);
                 let logs = [];
                 logsSnap.forEach(doc => logs.push(doc.data()));
                 logs.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
                 
-                const recentLogs = logs.slice(0, 5); // Get top 5 recent
+                const recentLogs = logs.slice(0, 5); 
                 
                 if (recentLogs.length === 0) {
                     recentLogsTbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm text-slate-500">No exports yet.</td></tr>';
@@ -941,7 +963,6 @@
                     const totalToDelete = snapshot.size;
                     
                     if (totalToDelete === 0) {
-                        // Cleanup metadata list if it exists there but database has no actual leads
                         const metaDocRef = doc(db, metaCollectionPath, 'categoriesList');
                         const metaDoc = await getDoc(metaDocRef);
                         if (metaDoc.exists()) {
@@ -959,7 +980,6 @@
                     showLoader(`Deleting ${totalToDelete} leads...`);
                     let deletedCount = 0;
                     
-                    // Sequentially delete docs to bypass payload limits in sandbox environment safely
                     for (const docSnapshot of snapshot.docs) {
                         await deleteDoc(doc(db, leadsCollectionPath, docSnapshot.id));
                         deletedCount++;
@@ -980,7 +1000,6 @@
                     hideLoader();
                     Swal.fire('Deleted!', `Successfully deleted ${totalToDelete} leads from "${categoryName}".`, 'success');
                     
-                    // Refresh data across the app
                     loadDashboardData();
                     loadCategoriesForExport();
 
@@ -991,6 +1010,110 @@
                 }
             }
         }
+
+        window.loadDatapacketsList = async function() {
+            if (!isFirebaseReady) return;
+            const selector = document.getElementById('datapacket-selector');
+            selector.innerHTML = '<option value="">Loading...</option>';
+            document.getElementById('dp-details-container').classList.add('hidden');
+            
+            try {
+                const metaDocRef = doc(db, metaCollectionPath, 'categoriesList');
+                const metaDoc = await getDoc(metaDocRef);
+                
+                selector.innerHTML = '<option value="">-- Select a Datapacket --</option>';
+
+                if (metaDoc.exists() && metaDoc.data().list) {
+                    const categories = metaDoc.data().list;
+                    categories.forEach(cat => {
+                        const opt = document.createElement('option');
+                        opt.value = cat; opt.innerText = cat;
+                        selector.appendChild(opt);
+                    });
+                } else {
+                    selector.innerHTML = '<option value="">No datapackets found</option>';
+                }
+            } catch (err) {
+                console.error("Error loading datapackets", err);
+                selector.innerHTML = '<option value="">Error loading data</option>';
+            }
+        };
+
+        window.loadDatapacketDetails = async function(packetName) {
+            if (!packetName) {
+                document.getElementById('dp-details-container').classList.add('hidden');
+                return;
+            }
+            if (!isFirebaseReady) return;
+
+            showLoader(`Analyzing ${packetName}...`);
+            document.getElementById('dp-details-container').classList.remove('hidden');
+
+            try {
+                const leadsRef = collection(db, leadsCollectionPath);
+                const q = query(leadsRef, where("Category", "==", packetName));
+                const snapshot = await getDocs(q);
+
+                let total = 0;
+                let tzStats = { 'EST': 0, 'CST': 0, 'MST': 0, 'PST': 0, 'Unknown': 0 };
+                let stateStats = {};
+
+                snapshot.forEach(doc => {
+                    total++;
+                    const data = doc.data();
+                    const tz = data.TimeZone || 'Unknown';
+                    const state = data.State || 'Unknown';
+
+                    if (tzStats[tz] !== undefined) tzStats[tz]++;
+                    else tzStats['Unknown']++;
+
+                    if (stateStats[state]) stateStats[state]++;
+                    else stateStats[state] = 1;
+                });
+
+                // Update Total Count
+                document.getElementById('dp-stat-total').innerText = total.toLocaleString();
+
+                // Render Timezones Grid
+                const tzGrid = document.getElementById('dp-tz-grid');
+                tzGrid.innerHTML = '';
+                for (const [tz, count] of Object.entries(tzStats)) {
+                    tzGrid.innerHTML += `
+                        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+                            <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">${tz}</div>
+                            <div class="text-2xl font-bold text-slate-700">${count.toLocaleString()}</div>
+                        </div>
+                    `;
+                }
+
+                // Render States List (sorted by highest count)
+                const stateBody = document.getElementById('dp-state-body');
+                stateBody.innerHTML = '';
+                
+                const sortedStates = Object.entries(stateStats).sort((a, b) => b[1] - a[1]);
+                
+                if (sortedStates.length === 0) {
+                    stateBody.innerHTML = '<tr><td colspan="2" class="px-6 py-4 text-center text-sm text-slate-500">No state data available.</td></tr>';
+                } else {
+                    sortedStates.forEach(([state, count]) => {
+                        stateBody.innerHTML += `
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-slate-800">${state}</td>
+                                <td class="px-6 py-3 whitespace-nowrap text-sm text-blue-600 font-semibold">${count.toLocaleString()}</td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                hideLoader();
+
+            } catch (error) {
+                console.error("Error analyzing datapacket:", error);
+                hideLoader();
+                Swal.fire('Error', 'Failed to load datapacket details.', 'error');
+                document.getElementById('dp-details-container').classList.add('hidden');
+            }
+        };
     </script>
 </body>
 </html>
