@@ -96,13 +96,15 @@
             </div>
         </aside>
 
+        <!-- Main Content Area -->
         <main class="flex-1 flex flex-col h-full bg-slate-50 overflow-hidden">
             <header class="bg-white shadow-sm z-0">
                 <div class="px-8 py-5 flex items-center justify-between">
                     <h2 class="text-2xl font-semibold text-slate-800">Maaz International - BPO Cold Calling Dashboard</h2>
                 </div>
             </header>
-            
+
+            <!-- Scrollable View Container -->
             <div class="flex-1 overflow-y-auto p-8">
                 
                 <!-- Tab: Overview / Dashboard -->
@@ -168,7 +170,7 @@
 
                 <!-- Tab: Datapackets Details -->
                 <div id="view-datapackets" class="tab-content max-w-5xl mx-auto">
-                    
+                    <!-- Master List -->
                     <div id="dp-list-container" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
                         <div class="px-6 py-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                             <div>
@@ -190,7 +192,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="datapackets-table-body" class="bg-white divide-y divide-slate-200">
-                                    <tr><td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500">Loading data...</td></tr>
+                                    <tr><td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500">Loading datapackets...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -200,10 +202,10 @@
                     <div id="dp-details-container" class="hidden space-y-6">
                         <div class="flex items-center justify-between mb-2">
                             <div>
-                                <h2 class="text-2xl font-bold text-slate-800" id="dp-details-title">Datapacket Details</h2>
-                                <p class="text-sm text-slate-500 mt-1">Detailed breakdown by timezone and state. Delete specific timezones if necessary.</p>
+                                <h2 class="text-2xl font-bold text-slate-800" id="dp-details-title">Packet Details</h2>
+                                <p class="text-sm text-slate-500 mt-1">Detailed breakdown by timezone and state.</p>
                             </div>
-                            <button onclick="hideDatapacketDetails()" class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
+                            <button onclick="hideDatapacketDetails()" class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors shadow-sm">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                                 Back to List
                             </button>
@@ -280,6 +282,15 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="flex items-start bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                    <div class="flex items-center h-5">
+                                        <input id="upload-dedup" type="checkbox" checked class="w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer">
+                                    </div>
+                                    <div class="ml-3 text-sm">
+                                        <label for="upload-dedup" class="font-medium text-slate-800 cursor-pointer">Filter Duplicates Globally</label>
+                                        <p class="text-slate-500 text-xs mt-1">Check this to cross-reference the entire database. Any numbers already existing in the system (even in other datapackets) will be skipped.</p>
+                                    </div>
+                                </div>
                                 <div class="pt-2">
                                     <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-3 rounded-lg shadow-sm transition-colors flex justify-center items-center">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
@@ -299,7 +310,7 @@
                                 <h3 class="text-lg font-semibold text-slate-800">Export Leads Data</h3>
                                 <p class="text-sm text-slate-500 mt-1">Filter your processed lists by datapacket and timezone to generate targeted calling lists.</p>
                             </div>
-                            <button onclick="loadDatapacketsForExport()" class="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-50" title="Refresh Datapackets">
+                            <button onclick="loadDatapacketsForDropdowns()" class="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-50" title="Refresh Datapackets">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             </button>
                         </div>
@@ -385,8 +396,10 @@
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, setDoc, query, where, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // Handle Sandbox Environment App ID & Configurations
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'maaz-bpo-app';
         
+        // User provided config
         const customFirebaseConfig = {
             apiKey: "AIzaSyAgwMd4nibgj5DfPmTVak_26GFPqXuDHEo",
             authDomain: "data-management-44b28.firebaseapp.com",
@@ -398,16 +411,19 @@
         };
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : customFirebaseConfig;
 
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        // Strict Paths mapping
         const leadsCollectionPath = `artifacts/${appId}/public/data/leads`;
         const exportLogsCollectionPath = `artifacts/${appId}/public/data/export_logs`;
-        const metaCollectionPath = `artifacts/${appId}/public/data/metadata`;
+        const metaCollectionPath = `artifacts/${appId}/public/data/metadata`; // For storing unique datapackets list
 
         let isFirebaseReady = false;
 
+        // Hardcoded Credentials
         const ADMIN_EMAIL = 'm.m.raza2932@gmail.com';
         const ADMIN_PASS = 'Maaz@2026';
 
@@ -468,7 +484,7 @@
 
             if (tabName === 'overview') loadDashboardData();
             if (tabName === 'datapackets') loadDatapacketsList();
-            if (tabName === 'export') loadDatapacketsForExport();
+            if (tabName === 'export') loadDatapacketsForDropdowns();
             if (tabName === 'logs') loadExportLogs();
         }
 
@@ -489,7 +505,7 @@
             try {
                 await signInAnonymously(auth);
                 isFirebaseReady = true;
-                loadDatapacketsForExport();
+                loadDatapacketsForDropdowns();
                 loadDashboardData();
             } catch (error) {
                 console.error("Firebase Auth Error: ", error);
@@ -565,6 +581,211 @@
             return { number: cleanPhone, areaCode, state, tz };
         }
 
+        window.loadDatapacketsList = async function() {
+            if (!isFirebaseReady) return;
+            const tbody = document.getElementById('datapackets-table-body');
+            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500">Loading datapackets...</td></tr>';
+            
+            try {
+                const metaDocRef = doc(db, metaCollectionPath, 'datapacketsList');
+                const metaDoc = await getDoc(metaDocRef);
+                
+                let packets = [];
+                if (metaDoc.exists() && metaDoc.data().list) {
+                    packets = metaDoc.data().list;
+                }
+
+                if (packets.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500">No datapackets found. Upload leads to create one.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                const leadsRef = collection(db, leadsCollectionPath);
+                
+                for (let i = 0; i < packets.length; i++) {
+                    const packet = packets[i];
+                    const q = query(leadsRef, where("Datapacket", "==", packet));
+                    const snap = await getDocs(q);
+                    const count = snap.size;
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 transition-colors';
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${i + 1}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800">${packet}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-semibold">${count.toLocaleString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                            <button onclick="viewDatapacket('${packet}')" class="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md transition-colors shadow-sm border border-blue-100">View / Manage</button>
+                            <button onclick="deleteDatapacket('${packet}')" class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md transition-colors shadow-sm border border-red-100">
+                                <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                Delete
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            } catch (error) {
+                console.error("Error loading datapackets:", error);
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-sm text-red-500">Failed to load datapackets.</td></tr>';
+            }
+        }
+
+        window.hideDatapacketDetails = function() {
+            document.getElementById('dp-details-container').classList.add('hidden');
+            document.getElementById('dp-list-container').classList.remove('hidden');
+            loadDatapacketsList(); // Refresh counts when returning to main list
+        }
+
+        window.viewDatapacket = async function(packet) {
+            document.getElementById('dp-list-container').classList.add('hidden');
+            document.getElementById('dp-details-container').classList.remove('hidden');
+            document.getElementById('dp-details-title').innerText = `Datapacket: ${packet}`;
+            
+            showLoader('Loading packet details...');
+            try {
+                const leadsRef = collection(db, leadsCollectionPath);
+                const q = query(leadsRef, where("Datapacket", "==", packet));
+                const snap = await getDocs(q);
+                
+                let total = 0;
+                let tzCounts = { 'EST': 0, 'CST': 0, 'MST': 0, 'PST': 0, 'Unknown': 0 };
+                let stateCounts = {};
+
+                snap.forEach(doc => {
+                    total++;
+                    const data = doc.data();
+                    if (tzCounts[data.TimeZone] !== undefined) tzCounts[data.TimeZone]++;
+                    else tzCounts['Unknown']++;
+
+                    if (!stateCounts[data.State]) stateCounts[data.State] = 0;
+                    stateCounts[data.State]++;
+                });
+
+                document.getElementById('dp-stat-total').innerText = total.toLocaleString();
+
+                const tzGrid = document.getElementById('dp-tz-grid');
+                tzGrid.innerHTML = '';
+                Object.keys(tzCounts).forEach(tz => {
+                    if (tz === 'Unknown' && tzCounts[tz] === 0) return;
+                    
+                    tzGrid.innerHTML += `
+                        <div class="bg-white border border-slate-200 rounded-lg p-4 flex flex-col items-center justify-between">
+                            <div class="text-xs text-slate-500 uppercase mb-1">${tz}</div>
+                            <div class="text-2xl font-bold text-slate-700 mb-3">${tzCounts[tz].toLocaleString()}</div>
+                            ${tzCounts[tz] > 0 ? `<button onclick="deleteDatapacketTimezone('${packet}', '${tz}')" class="text-xs text-red-600 hover:text-red-800 bg-red-50 px-2 py-1 rounded w-full flex justify-center items-center shadow-sm">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                Delete ${tz}
+                            </button>` : `<div class="h-6"></div>`}
+                        </div>
+                    `;
+                });
+
+                const stateBody = document.getElementById('dp-state-body');
+                stateBody.innerHTML = '';
+                const sortedStates = Object.keys(stateCounts).sort((a,b) => stateCounts[b] - stateCounts[a]);
+                
+                sortedStates.forEach(state => {
+                    stateBody.innerHTML += `
+                        <tr>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-slate-800">${state}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-slate-600">${stateCounts[state].toLocaleString()}</td>
+                        </tr>
+                    `;
+                });
+
+            } catch (error) {
+                console.error("Error viewing datapacket:", error);
+                Swal.fire('Error', 'Failed to load details.', 'error');
+            }
+            hideLoader();
+        }
+
+        window.deleteDatapacket = async function(packet) {
+            const result = await Swal.fire({
+                title: `Delete ${packet}?`,
+                text: "This will permanently remove all leads in this datapacket. You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            });
+
+            if (result.isConfirmed) {
+                showLoader(`Deleting ${packet}...`);
+                try {
+                    const leadsRef = collection(db, leadsCollectionPath);
+                    const q = query(leadsRef, where("Datapacket", "==", packet));
+                    const snap = await getDocs(q);
+                    
+                    let count = 0;
+                    for (const document of snap.docs) {
+                        await deleteDoc(document.ref);
+                        count++;
+                        if (count % 50 === 0) document.getElementById('loader-text').innerText = `Deleted ${count} leads...`;
+                    }
+
+                    // Remove from list in DB metadata
+                    const metaDocRef = doc(db, metaCollectionPath, 'datapacketsList');
+                    const metaDoc = await getDoc(metaDocRef);
+                    if (metaDoc.exists()) {
+                        let list = metaDoc.data().list || [];
+                        list = list.filter(item => item !== packet);
+                        await setDoc(metaDocRef, { list: list });
+                    }
+
+                    hideLoader();
+                    Swal.fire('Deleted!', `Datapacket "${packet}" and its ${count} leads have been deleted.`, 'success');
+                    
+                    loadDatapacketsList();
+                    loadDatapacketsForDropdowns();
+                    loadDashboardData();
+                } catch (error) {
+                    hideLoader();
+                    Swal.fire('Error', 'Failed to delete datapacket.', 'error');
+                }
+            }
+        }
+
+        window.deleteDatapacketTimezone = async function(packet, tz) {
+            const result = await Swal.fire({
+                title: `Delete ${tz} leads in ${packet}?`,
+                text: "This will permanently remove all leads matching this timezone in this datapacket.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete them!'
+            });
+
+            if (result.isConfirmed) {
+                showLoader(`Deleting ${tz} leads...`);
+                try {
+                    const leadsRef = collection(db, leadsCollectionPath);
+                    const q = query(leadsRef, where("Datapacket", "==", packet));
+                    const snap = await getDocs(q);
+                    
+                    let count = 0;
+                    for (const document of snap.docs) {
+                        if (document.data().TimeZone === tz) {
+                            await deleteDoc(document.ref);
+                            count++;
+                            if (count % 50 === 0) document.getElementById('loader-text').innerText = `Deleted ${count} leads...`;
+                        }
+                    }
+
+                    hideLoader();
+                    Swal.fire('Deleted!', `Removed ${count} ${tz} leads from "${packet}".`, 'success');
+                    viewDatapacket(packet); // Refresh specific datapacket view
+                    loadDashboardData(); // Update generic stats
+                } catch (error) {
+                    hideLoader();
+                    Swal.fire('Error', 'Failed to delete timezone leads.', 'error');
+                }
+            }
+        }
+
         document.getElementById('upload-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isFirebaseReady) return Swal.fire('Error', 'Database not connected yet.', 'error');
@@ -628,21 +849,35 @@
                         }
                     });
 
-                    showLoader('Checking existing database records...');
+                    const doDedup = document.getElementById('upload-dedup').checked;
                     const leadsRef = collection(db, leadsCollectionPath);
-                    const datapacketQuery = query(leadsRef, where("Datapacket", "==", datapacket));
-                    const existingDocs = await getDocs(datapacketQuery);
-                    
-                    const dbSet = new Set();
-                    existingDocs.forEach(doc => {
-                        dbSet.add(doc.data().PhoneNumber);
-                    });
+                    let finalUniqueRecords = processedRecords;
+                    let duplicateCount = 0;
+                    const totalParsedFromExcel = processedRecords.length;
 
-                    const finalUniqueRecords = processedRecords.filter(r => !dbSet.has(r.PhoneNumber));
+                    if (doDedup) {
+                        showLoader('Fetching database records for global deduplication...');
+                        
+                        // Fetch ALL leads to ensure no duplicates across the entire system
+                        const existingDocs = await getDocs(leadsRef);
+                        
+                        const dbSet = new Set();
+                        existingDocs.forEach(doc => {
+                            dbSet.add(doc.data().PhoneNumber);
+                        });
+
+                        finalUniqueRecords = processedRecords.filter(r => {
+                            if (dbSet.has(r.PhoneNumber)) {
+                                duplicateCount++;
+                                return false;
+                            }
+                            return true;
+                        });
+                    }
 
                     if (finalUniqueRecords.length === 0) {
                         hideLoader();
-                        return Swal.fire('Completed', 'No new unique records found. All numbers were duplicates.', 'info');
+                        return Swal.fire('Completed', `Processed ${totalParsedFromExcel} valid numbers. All of them were duplicates in the system and were skipped.`, 'info');
                     }
 
                     showLoader(`Saving ${finalUniqueRecords.length} new records...`);
@@ -659,7 +894,18 @@
                     hideLoader();
                     document.getElementById('upload-form').reset();
                     document.getElementById('file-name-display').innerText = 'XLSX up to 10MB';
-                    Swal.fire('Success!', `Successfully imported ${finalUniqueRecords.length} unique leads.`, 'success');
+                    
+                    Swal.fire({
+                        title: 'Upload Complete!',
+                        html: `
+                            <div class="text-left mt-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                                <p class="mb-2 text-slate-700"><b>Total Valid Numbers in File:</b> ${totalParsedFromExcel}</p>
+                                ${doDedup ? `<p class="mb-2 text-red-600"><b>Duplicates Skipped (System-wide):</b> ${duplicateCount}</p>` : `<p class="mb-2 text-slate-500"><b>Duplicates Skipped:</b> <i>Check Disabled</i></p>`}
+                                <p class="text-green-600 font-semibold text-lg border-t border-slate-200 pt-2 mt-2"><b>Successfully Uploaded:</b> ${finalUniqueRecords.length}</p>
+                            </div>
+                        `,
+                        icon: 'success'
+                    });
 
                 } catch (error) {
                     console.error("Upload Error:", error);
@@ -689,174 +935,7 @@
             }
         }
 
-        window.loadDatapacketsList = async function() {
-            if (!isFirebaseReady) return;
-            const tbody = document.getElementById('datapackets-table-body');
-            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500">Loading datapackets...</td></tr>';
-            try {
-                const metaDocRef = doc(db, metaCollectionPath, 'datapacketsList');
-                const metaDoc = await getDoc(metaDocRef);
-                let datapackets = metaDoc.exists() ? metaDoc.data().list || [] : [];
-                
-                if(datapackets.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500">No datapackets found. Upload leads to create one.</td></tr>';
-                    return;
-                }
-                
-                tbody.innerHTML = '';
-                for (let i = 0; i < datapackets.length; i++) {
-                    const dpName = datapackets[i];
-                    
-                    // Count leads per datapacket for the table view
-                    const q = query(collection(db, leadsCollectionPath), where("Datapacket", "==", dpName));
-                    const snap = await getDocs(q);
-                    const count = snap.size;
-
-                    const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-slate-50 transition-colors';
-                    tr.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${i + 1}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800">${dpName}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-semibold">${count.toLocaleString()}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
-                            <button onclick="viewDatapacket('${dpName}')" class="text-blue-600 hover:text-blue-900 transition-colors">View / Edit</button>
-                            <button onclick="deleteDatapacket('${dpName}')" class="text-red-600 hover:text-red-900 transition-colors">Delete</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                }
-            } catch (e) {
-                console.error(e);
-                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-sm text-red-500">Error loading data.</td></tr>';
-            }
-        };
-
-        window.viewDatapacket = async function(dpName) {
-            document.getElementById('dp-list-container').classList.add('hidden');
-            document.getElementById('dp-details-container').classList.remove('hidden');
-            document.getElementById('dp-details-title').innerText = `Datapacket: ${dpName}`;
-
-            const tzGrid = document.getElementById('dp-tz-grid');
-            const stateBody = document.getElementById('dp-state-body');
-            document.getElementById('dp-stat-total').innerText = '...';
-            tzGrid.innerHTML = '<div class="col-span-5 text-sm text-slate-500">Loading timezone breakdown...</div>';
-            stateBody.innerHTML = '<tr><td colspan="2" class="px-6 py-4 text-center text-sm text-slate-500">Loading state data...</td></tr>';
-
-            try {
-                const q = query(collection(db, leadsCollectionPath), where("Datapacket", "==", dpName));
-                const snap = await getDocs(q);
-
-                let total = 0;
-                let tzCounts = { 'EST': 0, 'CST': 0, 'MST': 0, 'PST': 0, 'Unknown': 0 };
-                let stateCounts = {};
-
-                snap.forEach(doc => {
-                    total++;
-                    const data = doc.data();
-                    const tz = data.TimeZone;
-                    const state = data.State;
-                    if (tzCounts[tz] !== undefined) tzCounts[tz]++; else tzCounts['Unknown']++;
-                    if (!stateCounts[state]) stateCounts[state] = 0;
-                    stateCounts[state]++;
-                });
-
-                document.getElementById('dp-stat-total').innerText = total.toLocaleString();
-
-                tzGrid.innerHTML = Object.keys(tzCounts).map(tz => `
-                    <div class="bg-slate-50 rounded-lg p-3 border border-slate-100 flex flex-col items-center relative group">
-                        <div class="text-xs text-slate-500 uppercase">${tz}</div>
-                        <div class="text-xl font-bold text-slate-700">${tzCounts[tz].toLocaleString()}</div>
-                        ${tzCounts[tz] > 0 ? `<button onclick="deleteTimezoneFromDatapacket('${dpName}', '${tz}')" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-red-600" title="Delete ALL ${tz} leads in this packet"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>` : ''}
-                    </div>
-                `).join('');
-
-                stateBody.innerHTML = Object.keys(stateCounts).sort().map(state => `
-                    <tr class="hover:bg-slate-50">
-                        <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-slate-800">${state}</td>
-                        <td class="px-6 py-3 whitespace-nowrap text-sm text-slate-600">${stateCounts[state].toLocaleString()}</td>
-                    </tr>
-                `).join('');
-
-            } catch (e) {
-                console.error(e);
-                Swal.fire('Error', 'Failed to load datapacket details.', 'error');
-            }
-        };
-
-        window.hideDatapacketDetails = function() {
-            document.getElementById('dp-details-container').classList.add('hidden');
-            document.getElementById('dp-list-container').classList.remove('hidden');
-        };
-
-        window.deleteDatapacket = async function(dpName) {
-            const result = await Swal.fire({
-                title: `Delete ${dpName}?`, text: "All leads attached to this datapacket will be permanently deleted.", icon: 'warning',
-                showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Yes, delete it!'
-            });
-            
-            if (result.isConfirmed) {
-                showLoader(`Deleting Datapacket: ${dpName}...`);
-                try {
-                    const q = query(collection(db, leadsCollectionPath), where("Datapacket", "==", dpName));
-                    const snap = await getDocs(q);
-                    
-                    let i = 0;
-                    for (const document of snap.docs) {
-                        await deleteDoc(doc(db, leadsCollectionPath, document.id));
-                        i++;
-                        if(i % 50 === 0) document.getElementById('loader-text').innerText = `Deleted ${i} leads...`;
-                    }
-
-                    const metaDocRef = doc(db, metaCollectionPath, 'datapacketsList');
-                    const metaDoc = await getDoc(metaDocRef);
-                    if (metaDoc.exists()) {
-                        let dps = metaDoc.data().list || [];
-                        dps = dps.filter(d => d !== dpName);
-                        await setDoc(metaDocRef, { list: dps });
-                    }
-
-                    hideLoader();
-                    Swal.fire('Deleted!', 'The datapacket has been removed entirely.', 'success');
-                    loadDatapacketsList(); 
-                } catch (e) {
-                    console.error(e);
-                    hideLoader();
-                    Swal.fire('Error', 'Failed to delete datapacket.', 'error');
-                }
-            }
-        };
-
-        window.deleteTimezoneFromDatapacket = async function(dpName, tz) {
-             const result = await Swal.fire({
-                title: `Delete ${tz} leads?`, text: `Remove all ${tz} timezone leads from the ${dpName} datapacket?`, icon: 'warning',
-                showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Yes, delete them'
-            });
-            if (result.isConfirmed) {
-                showLoader(`Deleting ${tz} leads...`);
-                try {
-                    const q = query(collection(db, leadsCollectionPath), where("Datapacket", "==", dpName));
-                    const snap = await getDocs(q);
-                    
-                    let i = 0;
-                    for (const document of snap.docs) {
-                        if (document.data().TimeZone === tz) {
-                            await deleteDoc(doc(db, leadsCollectionPath, document.id));
-                            i++;
-                            if(i % 50 === 0) document.getElementById('loader-text').innerText = `Deleted ${i} leads...`;
-                        }
-                    }
-                    hideLoader();
-                    Swal.fire('Deleted!', `Successfully removed ${i} leads mapped to ${tz}.`, 'success');
-                    viewDatapacket(dpName); 
-                } catch (e) {
-                    console.error(e);
-                    hideLoader();
-                    Swal.fire('Error', 'Failed to delete leads.', 'error');
-                }
-            }
-        };
-
-        window.loadDatapacketsForExport = async function() {
+        window.loadDatapacketsForDropdowns = async function() {
             if (!isFirebaseReady) return;
             const exportSelect = document.getElementById('export-datapacket');
             const uploadSelect = document.getElementById('upload-datapacket-select');
@@ -953,7 +1032,7 @@
                 hideLoader();
                 Swal.fire('Export Complete', `${finalExportData.length} leads successfully exported.`, 'success');
 
-                loadDashboardData(); // Update dashboard logs table
+                loadDashboardData();
 
             } catch (error) {
                 console.error("Export error:", error);
