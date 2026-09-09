@@ -92,7 +92,6 @@
             </div>
         </aside>
 
-        <!-- Main Content Area -->
         <main class="flex-1 flex flex-col h-full bg-slate-50 overflow-hidden">
             <!-- Header -->
             <header class="bg-white shadow-sm z-0">
@@ -138,6 +137,27 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Leads by Category Breakdown -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+                        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                            <h3 class="text-md font-semibold text-slate-800">Leads by Category</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-200">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Category Name</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Total Leads</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="category-breakdown-body" class="bg-white divide-y divide-slate-200">
+                                    <tr><td colspan="3" class="px-6 py-4 text-center text-sm text-slate-500">Loading data...</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
@@ -305,7 +325,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, query, where, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // Included deleteDoc for the new Delete Category feature
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, query, where, orderBy, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Handle Sandbox Environment App ID & Configurations
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'maaz-bpo-app';
@@ -418,7 +439,6 @@
         // Initialize Firebase Anonymously in Background (Mandatory Rule 3)
         async function initFirebaseBackground() {
             try {
-                // To satisfy sandbox rules while keeping the user's custom auth UI
                 await signInAnonymously(auth);
                 isFirebaseReady = true;
                 // Pre-load data
@@ -565,7 +585,7 @@
                         }
                     });
 
-                    // 3. Database Deduplication (Rule 2: Simple query to avoid index requirements)
+                    // 3. Database Deduplication 
                     showLoader('Checking existing database records...');
                     const leadsRef = collection(db, leadsCollectionPath);
                     const categoryQuery = query(leadsRef, where("Category", "==", category));
@@ -583,7 +603,7 @@
                         return Swal.fire('Completed', 'No new unique records found. All numbers were duplicates.', 'info');
                     }
 
-                    // 4. Batch Saving to Firestore (Sequentially to avoid massive payload rejections, with progress)
+                    // 4. Batch Saving to Firestore 
                     showLoader(`Saving ${finalUniqueRecords.length} new records...`);
                     
                     for(let i=0; i<finalUniqueRecords.length; i++){
@@ -610,7 +630,7 @@
             reader.readAsBinaryString(file);
         });
 
-        // Maintain a single document for categories to avoid heavy DISTINCT queries
+        // Maintain a single document for categories
         async function updateCategoriesMeta(newCategory) {
             try {
                 const metaDocRef = doc(db, metaCollectionPath, 'categoriesList');
@@ -679,7 +699,6 @@
             try {
                 showLoader('Extracting Data from Database...');
                 
-                // Rule 2: Single simple query. Filter timezone in-memory.
                 const leadsRef = collection(db, leadsCollectionPath);
                 const exportQuery = query(leadsRef, where("Category", "==", category));
                 const snapshot = await getDocs(exportQuery);
@@ -764,7 +783,6 @@
             
             try {
                 const logsRef = collection(db, exportLogsCollectionPath);
-                // Due to Sandbox Rule 2 (No complex orderBy that require indexes), fetch all logs and sort in JS
                 const snapshot = await getDocs(logsRef);
                 
                 let logs = [];
@@ -810,6 +828,9 @@
             document.getElementById('stat-mst').innerText = '...';
             document.getElementById('stat-pst').innerText = '...';
             
+            const categoryTbody = document.getElementById('category-breakdown-body');
+            categoryTbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm text-slate-500">Loading data...</td></tr>';
+
             const recentLogsTbody = document.getElementById('recent-logs-body');
             recentLogsTbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm text-slate-500">Loading data...</td></tr>';
 
@@ -820,12 +841,19 @@
                 
                 let total = 0;
                 let tzCounts = { 'EST': 0, 'CST': 0, 'MST': 0, 'PST': 0, 'Unknown': 0 };
+                let categoryCounts = {};
                 
                 leadsSnap.forEach(doc => {
                     total++;
-                    const tz = doc.data().TimeZone;
+                    const data = doc.data();
+                    const tz = data.TimeZone;
+                    const cat = data.Category;
+
                     if (tzCounts[tz] !== undefined) tzCounts[tz]++;
                     else tzCounts['Unknown']++;
+
+                    if (categoryCounts[cat]) categoryCounts[cat]++;
+                    else categoryCounts[cat] = 1;
                 });
 
                 // Update UI Stats securely
@@ -834,6 +862,28 @@
                 document.getElementById('stat-cst').innerText = tzCounts['CST'].toLocaleString();
                 document.getElementById('stat-mst').innerText = tzCounts['MST'].toLocaleString();
                 document.getElementById('stat-pst').innerText = tzCounts['PST'].toLocaleString();
+
+                // Render Category Breakdown
+                categoryTbody.innerHTML = '';
+                if (Object.keys(categoryCounts).length === 0) {
+                    categoryTbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm text-slate-500">No categories found.</td></tr>';
+                } else {
+                    for (const [catName, count] of Object.entries(categoryCounts)) {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-slate-50 transition-colors';
+                        tr.innerHTML = `
+                            <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-slate-800">${catName}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-blue-600 font-semibold">${count.toLocaleString()}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-right">
+                                <button onclick="deleteCategoryData('${catName}')" class="text-red-500 hover:text-red-700 font-medium text-sm inline-flex items-center justify-end px-3 py-1 rounded-md hover:bg-red-50 transition-colors">
+                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    Delete
+                                </button>
+                            </td>
+                        `;
+                        categoryTbody.appendChild(tr);
+                    }
+                }
 
                 // Fetch Recent Export Logs
                 const logsRef = collection(db, exportLogsCollectionPath);
@@ -865,6 +915,80 @@
             } catch (error) {
                 console.error("Dashboard error:", error);
                 recentLogsTbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-sm text-red-500">Failed to load dashboard data.</td></tr>';
+            }
+        }
+
+        window.deleteCategoryData = async function(categoryName) {
+            if (!isFirebaseReady) return;
+
+            const confirmResult = await Swal.fire({
+                title: 'Delete Category?',
+                text: `You are about to permanently delete ALL leads in "${categoryName}". This action cannot be undone!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, Delete All'
+            });
+
+            if (confirmResult.isConfirmed) {
+                try {
+                    showLoader(`Fetching records for ${categoryName}...`);
+                    const leadsRef = collection(db, leadsCollectionPath);
+                    const q = query(leadsRef, where("Category", "==", categoryName));
+                    const snapshot = await getDocs(q);
+
+                    const totalToDelete = snapshot.size;
+                    
+                    if (totalToDelete === 0) {
+                        // Cleanup metadata list if it exists there but database has no actual leads
+                        const metaDocRef = doc(db, metaCollectionPath, 'categoriesList');
+                        const metaDoc = await getDoc(metaDocRef);
+                        if (metaDoc.exists()) {
+                            let categories = metaDoc.data().list || [];
+                            categories = categories.filter(c => c !== categoryName);
+                            await setDoc(metaDocRef, { list: categories });
+                        }
+                        hideLoader();
+                        loadDashboardData();
+                        loadCategoriesForExport();
+                        Swal.fire('Cleaned Up', 'Category removed.', 'info');
+                        return;
+                    }
+
+                    showLoader(`Deleting ${totalToDelete} leads...`);
+                    let deletedCount = 0;
+                    
+                    // Sequentially delete docs to bypass payload limits in sandbox environment safely
+                    for (const docSnapshot of snapshot.docs) {
+                        await deleteDoc(doc(db, leadsCollectionPath, docSnapshot.id));
+                        deletedCount++;
+                        if (deletedCount % 25 === 0) {
+                            document.getElementById('loader-text').innerText = `Deleted ${deletedCount} of ${totalToDelete} leads...`;
+                        }
+                    }
+
+                    document.getElementById('loader-text').innerText = `Updating system lists...`;
+                    const metaDocRef = doc(db, metaCollectionPath, 'categoriesList');
+                    const metaDoc = await getDoc(metaDocRef);
+                    if (metaDoc.exists()) {
+                        let categories = metaDoc.data().list || [];
+                        categories = categories.filter(c => c !== categoryName);
+                        await setDoc(metaDocRef, { list: categories });
+                    }
+
+                    hideLoader();
+                    Swal.fire('Deleted!', `Successfully deleted ${totalToDelete} leads from "${categoryName}".`, 'success');
+                    
+                    // Refresh data across the app
+                    loadDashboardData();
+                    loadCategoriesForExport();
+
+                } catch (error) {
+                    console.error("Delete error:", error);
+                    hideLoader();
+                    Swal.fire('Error', 'Failed to delete category data.', 'error');
+                }
             }
         }
     </script>
